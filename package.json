@@ -1,0 +1,27 @@
+{
+  "name": "sb-demo-post-generator",
+  "version": "1.0.0",
+  "description": "Automatically generate news in your Staffbase environment from public data available for a company. ",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --env-file .env src/index.js",
+    "start": "STAGE=production node --env-file .env src/index.js"
+  },
+  "author": "Chinonso Nwabueze",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/firestore": "^7.10.0",
+    "@google/generative-ai": "^0.17.1",
+    "apify-client": "^2.9.5",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.2.0",
+    "lodash.merge": "^4.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
