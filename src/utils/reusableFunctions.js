@@ -71,6 +71,44 @@ export const scrapeLinkedinPosts = async (cookies, totalPosts, pageURL) => {
 
 }
 
+export const scrapeLinkedinPostsRawData = async (cookies, totalPosts, pageURL) => {
+    try {
+        // Client initialization with the API token for Apify LinkedIn Scraper
+        const client = new ApifyClient({
+            token: process.env.APIFY_API_KEY,
+        });
+
+        // Actor Input needed for things like authorization and specifications on what exactly to pull (company name, start/end, page, etc)
+        const input = {
+            "cookie": cookies,
+            "deepScrape": true,
+            "rawData": true,
+            "urls": [pageURL],
+            "maxDelay": 10,
+            "minDelay": 2,
+            "strictMode": false,
+            "proxy": {
+                "useApifyProxy": true,
+                "apifyProxyCountry": "US"
+            },
+            "limitPerSource": totalPosts,
+        };
+        // Run the Actor and wait for it to finish
+        const run = await client.actor("kfiWbq3boy3dWKbiL").call(input);
+
+        // Fetch Actor's results from the run's dataset (if any)
+        const { items } = await client.dataset(run.defaultDatasetId).listItems();
+
+        //return results
+        return { success: true, items };
+    } catch (error) {
+        return { success: false, error };
+        //res.status(500).json({ error: `There was an error pulling Linkedln posts: ${error.message}` });
+    }
+
+
+}
+
 /**
  * Generate's text (article title & body) with the help of the Google Gemini API
  *
