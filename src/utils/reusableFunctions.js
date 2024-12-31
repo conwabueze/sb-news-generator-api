@@ -156,6 +156,46 @@ export const generateArticleText = async (articleReference) => {
 
 }
 
+export const generateUpdateText = async (reference) => {
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        //Actual prompt we will be giving to AI to generate the articles body
+        const prompt = `Generate a paragraph, short or long, with no hashtags that I can post to social media. The generate paragraph should be wrapped in html paragraph element text. For any links generated in your text, please wrap them in text based html anchor elements (<a></a>). Please do no include any hashtags. Base your post on the following text:  \n ${reference}`;
+
+        //generate article body
+        const post = await model.generateContent(prompt);
+
+        const titlePrompt = `Create one short blog title unbolded based on the following information: \n ${reference}`
+
+        //generate article body
+        const postTitle = await model.generateContent(titlePrompt);
+
+        return { success: true, title: postTitle.response.text(), body: post.response.text() };
+    } catch (error) {
+        console.log(error);
+        return { success: false, error, errorMessage: `There was an issue converting the orginial into a article: ${error.message}` };
+    }
+
+
+}
+
+export const getChannelType = async (authKey, channelID) => {
+    try {
+        //Authorization Header
+        const headers = {
+            Authorization: `Basic ${authKey}`,
+
+        }
+        const baseUrl = `https://app.staffbase.com/api/channels/${channelID}`;
+        const response = await axios.get(baseUrl, { headers });
+        return response.data.contentType;
+    }catch(error){
+        console.log(error);
+    }
+}
+
 /**
  * Post Staffbase Article to specified channel
  *
@@ -231,3 +271,4 @@ export const createStaffbaseArticle = async (authKey, channelID, articleTitle, a
 
 
 }
+
