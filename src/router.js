@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import { handleInputErrors } from './utils/middleware.js';
-import { bulkScrapeLinkedinToStaffbaseArticle} from './handlers/linkedin.js';
+import { bulkScrapeLinkedinToStaffbaseArticle, testRoute} from './handlers/linkedin.js';
+import { generateComments } from './handlers/comments.js';
 
 const router = Router();
 
@@ -12,5 +13,8 @@ router.post('/bulkscrape/linkedin/article',
     handleInputErrors,
     bulkScrapeLinkedinToStaffbaseArticle
 );
+
+//router.post('/generate/comments', generateComments);
+router.post('/generate/test', testRoute);
 
 export default router;

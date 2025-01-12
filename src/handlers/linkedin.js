@@ -1,4 +1,4 @@
-import { getLinkedinCookies, scrapeLinkedinPosts, generateArticleText, createStaffbaseArticle, scrapeLinkedinPostsRawData, generateUpdateText, getChannelType} from "../utils/reusableFunctions.js";
+import { getLinkedinCookies, scrapeLinkedinPosts, generateArticleText, createStaffbaseArticle, scrapeLinkedinPostsRawData, generateUpdateText, getChannelType, uploadMediaToStaffbase} from "../utils/reusableFunctions.js";
 
 /*
 export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
@@ -121,7 +121,7 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
 
 
 const precheck = async (req, res, sbAuthKey, numPostsToScrape) => {
-    const sbTest = await createStaffbaseArticle(sbAuthKey, req.body.channelID, 'SB NEWS GEN: Start Up (please Delete this Article)', 'Testing the NEWS API is working. Please ignore this', '', false);
+    const sbTest = await createStaffbaseArticle(sbAuthKey, req.body.channelID, 'SB NEWS GEN: Start Up (please Delete this Article)', 'Testing the NEWS API is working. Please ignore this', '');
     //POST a Test Staffbase Post to ensure everything is good before proceeding
     if (!sbTest.success) {
         switch (sbTest.error.status) {
@@ -143,14 +143,14 @@ const precheck = async (req, res, sbAuthKey, numPostsToScrape) => {
     const cookies = await getLinkedinCookies();
     if (!cookies.success) {
         res.status(401).json({ error: 'NO_AUTH_COOKIES', message: 'There was an error in retrieving authentication cookies. Sorry for the inconvience. Please reach out to the SE Team to resolve this issue.' });
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No AUTH Cookies, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '', false);
+        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No AUTH Cookies, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '');
         return;
     }
 
     const gemTest = await generateArticleText('Write a short story about a robot who dreams of becoming a stand-up comedian. What challenges does it face? What kind of jokes does it tell?');
     if (!gemTest.success && [400, 403].includes(gemTest.error.status)) {
         res.status(403).json({ error: 'NO_GEMINI_AUTH', message: `There is an issue with the Gemini Authentication. Please reach out to the SE Team to resolve this issue.` })
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No GEMINI AUTH, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '', false);
+        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No GEMINI AUTH, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '');
         console.error(gemTest.error);
         return;
     }
@@ -168,7 +168,7 @@ const precheck = async (req, res, sbAuthKey, numPostsToScrape) => {
         const errorPostTitle = !posts.success
             ? 'SB NEWS GEN: Issue Pulling Post, please reach out to admin'
             : 'SB NEWS GEN: No Posts Returned, please make sure your are entering the correct Company URL. If issue continues, please reach out to admin'
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, errorPostTitle, 'Please delete this article once no longer needed', '', false);
+        await createStaffbaseArticle(sbAuthKey, req.body.channelID, errorPostTitle, 'Please delete this article once no longer needed', '');
         return;
     }
 
@@ -200,9 +200,12 @@ const postFilter = (post) => {
         filteredPostObject.postImage = url;
     }
 
-    const linkedInVideoComponentvideoPlayMetadata = post.content?.['com.linkedin.voyager.feed.render.LinkedInVideoComponent']?.videoPlayMetadata?.thumbnail?.artifacts[0]?.fileIdentifyingUrlPathSegment;
-    linkedInVideoComponentvideoPlayMetadata && (filteredPostObject.postImage = linkedInVideoComponentvideoPlayMetadata);
+    const linkedInVideoComponentvideoPlayMetadata = post.content?.['com.linkedin.voyager.feed.render.LinkedInVideoComponent']?.videoPlayMetadata?.thumbnail;
+    if(linkedInVideoComponentvideoPlayMetadata){
+        const url = linkedInVideoComponentvideoPlayMetadata.rootUrl + linkedInVideoComponentvideoPlayMetadata.artifacts[0].fileIdentifyingUrlPathSegment
+        filteredPostObject.postImage = url;
 
+    }
 
     const commentaryText = post.commentary?.text?.text;
     commentaryText && (filteredPostObject.postText = commentaryText);
@@ -244,18 +247,22 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
         }
 
         const bodyText = channelType === 'articles' ? titleAndBodyText.body : `${titleAndBodyText.body} \n\n <img src='${filteredPostObject.postImage}'/>`;
-        const postImage =  channelType === 'articles' ? filteredPostObject.postImage : '';
-
+        let postImage = '';
+        if(channelType === 'articles'){
+            const staffbaseCDNUrl = await uploadMediaToStaffbase(sbAuthKey, filteredPostObject.postImage, 'Gen Photo');
+            if(!staffbaseCDNUrl.success) return;
+            postImage = staffbaseCDNUrl.url;
+        }
+        
         const postToSB = await createStaffbaseArticle(sbAuthKey, channelID, titleAndBodyText.title, bodyText, postImage);
         if (!postToSB.success) {
             errorsObject.totalErrors++;
             const key = `error ${errorsObject.totalErrors}`;
-            errorsObject.errorMessages[key] = postToSB.errorMessage;
+            errorsObject.errorMessages[key] = postToSB.error;
             return;
         }
 
         successes++;
-        console.log(successes);
         return () => article;
     });
 
@@ -267,10 +274,18 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
     });
 
     if (jobComplete) {
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: ${successes} Articles Successfully Generated`, 'Please Delete This Article', '', false);
+        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: ${successes} Articles Successfully Generated`, 'Please Delete This Article', '');
     }
 }
 
+export const testRoute = async (req, res, next) => {
+    const sbAuthKey = req.headers.authorization.split(' ')[1]; //pull authkey from request
+    const imageUrl = 'https://www.thepopverse.com/_next/image?url=https%3A%2F%2Fmedia.thepopverse.com%2Fmedia%2Fnaruto-how-to-watch-t2ib4pj1c4ue3jz1mmmcnvpvge.jpg&w=1280&q=75';
+    const sbImageUrl = await uploadMediaToStaffbase(sbAuthKey, imageUrl, 'Test Image');
+    const articlePost = await createStaffbaseArticle(sbAuthKey, '66f316a9d0fc9e14d95f5748', 'Test post', 'bodies', imageUrl);
+    console.log(sbImageUrl);
+    res.status(400).json('heyy');
+}
 /*
 export const bulkScrapeLinkedinToStaffbaseUpdates = async (req, res, next) => {
     const sbAuthKey = req.headers.authorization.split(' ')[1]; //pull authkey from request
