@@ -73,21 +73,21 @@ export const createStaffbaseChannel = async (channelNames) => {
 
 }*/
 
-export const createSBNewsChannel = async (authKey, channelName) => {
+export const createSBNewsChannel = async (authKey, channelName, accessorIDs = []) => {
 
     const url = 'https://app.staffbase.com/api/installations';
 
     const data = {
         "pluginID": "news",
-        "config": { 
-            "localization": { 
-                "en_US": { 
-                    "title": `${channelName}`, "description": null 
-                } 
+        "config": {
+            "localization": {
+                "en_US": {
+                    "title": `${channelName}`, "description": null
+                }
             },
             showAdminActions: true,
             showPageBackground: true,
-            sidebarVisible: true 
+            sidebarVisible: true
         },
         "commentingAllowed": true,
         "commentingEnabledDefault": true,
@@ -105,7 +105,7 @@ export const createSBNewsChannel = async (authKey, channelName) => {
         "notificationChannelsDefault": ["email", "push"],
         "contentType": "articles",
         "visibleInPublicArea": false,
-        "accessorIDs": ["67603f8d1f883575e7d78169"] //you need this to have for all users visibility
+        "accessorIDs": accessorIDs //you need this to have for all users visibility
     };
 
     const headers = {
@@ -123,6 +123,25 @@ export const createSBNewsChannel = async (authKey, channelName) => {
 
 }
 
+export const deleteSBNewsChannel = async (authKey, channelID) => {
+
+    const url = `https://app.staffbase.com/api/installations/${channelID}`;
+
+    const headers = {
+        'Authorization': `Basic ${authKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.delete(url, { headers });
+        console.log(response);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+
+
+}
+
 export const publishSBNewsChannel = async (authKey, channelID) => {
     const url = `https://app.staffbase.com/api/installations/${channelID}/publish`;
 
@@ -130,13 +149,111 @@ export const publishSBNewsChannel = async (authKey, channelID) => {
         'Authorization': `Basic ${authKey}`,
         'Content-Type': 'application/json'
     };
-    
+
     const data = {};
 
     try {
         const response = await axios.post(url, {}, { headers });
-        
+
     } catch (error) {
         console.error('Error:', error);
+    }
+}
+
+export const unpublishSBNewsChannel = async (authKey, channelID) => {
+    const url = `https://app.staffbase.com/api/installations/${channelID}/unpublish`;
+
+    const headers = {
+        'Authorization': `Basic ${authKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    const data = {};
+
+    try {
+        const response = await axios.post(url, {}, { headers });
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+export const getSBNewsChannels = async (authKey) => {
+    const url = `https://app.staffbase.com/api/channels`;
+
+    const headers = {
+        'Authorization': `Basic ${authKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    const data = {};
+
+    try {
+        const response = await axios.get(url, { headers });
+        const channels = response.data.data;
+        //console.log(channels);
+        const channelIDs = channels.map((channel) => channel.id);
+        return channelIDs;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+export const getSBNewsChannelsBranch = async (authKey) => {
+    const url = `https://app.staffbase.com/api/branch/channels`;
+
+    const headers = {
+        'Authorization': `Basic ${authKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    const data = {};
+
+    try {
+        const response = await axios.get(url, { headers });
+        const channels = response.data.data;
+        //console.log(channels);
+        const channelIDs = channels.map((channel) => channel.id);
+        return channelIDs;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+export const getSBPage = async (authKey, pageID) => {
+    const url = `https://app.staffbase.com/api/pages/${pageID}`;
+    const headers = {
+        'Authorization': `Basic ${authKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    const data = {};
+
+    try {
+        const response = await axios.get(url, { headers });
+        const page = response.data;
+        return page;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+
+}
+
+export const getSBSpaces = async (authKey) => {
+    const url = `https://app.staffbase.com/api/spaces`;
+
+    const headers = {
+        'Authorization': `Basic ${authKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    const data = {};
+
+    try {
+        const response = await axios.get(url, { headers });
+        const data = response.data.data;
+        return {success: true, data};
+    } catch (error) {
+        return {success: false, error};
     }
 }

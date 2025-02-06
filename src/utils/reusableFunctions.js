@@ -181,6 +181,54 @@ export const generateUpdateText = async (reference) => {
 
 }
 
+export const generateContentText = async (reference, contentType) => {
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        let contentText = '';
+
+        if (contentType === 'articles') {
+            const structureExample = `Starting a blog was one of the most rewarding things I’ve done in my career. As someone who loves writing and connecting with readers, having an outlet to share my thoughts while potentially helping others has been an incredible experience.
+        When I first began blogging a few years ago, I really had no idea what I was doing. I would just sit down at my computer whenever inspiration struck and write whatever came to mind. Sometimes I would publish posts without even proofreading them because I was so eager to get my ideas out there.
+        Looking back now, those early posts were pretty rough. It’s almost cringe-worthy to read some of my early writing. But we all have to start somewhere, right? Even though I made plenty of mistakes (which I’ll detail later in this post), blogging has enabled me to find my voice, create helpful content, and connect with readers from all walks of life.
+        If you’re thinking about starting a blog but feel intimidated or don’t know where to begin, I want this post to encourage you. You don’t have to have everything figured out on day one. I certainly didn’t! Consider this your kick in the pants to just take that first step and start writing.
+        And to help you avoid some of the early pitfalls I encountered, I’ll take you through a step-by-step guide to learn how to write a great post, drawing from my own experience as well as expert insights from top bloggers. Get ready to take notes!`;
+
+            //Actual prompt we will be giving to AI to generate the articles body
+            const prompt = `write a long-style blog post in html paragraph elements with at least 5 paragraphs and a title in standard text based on the following information:  \n ${reference} \n Here is a example of what I want the structure to look like: ${structureExample}
+            Provide your answer in json in the following format:
+            {
+                title: 'Place title here',
+                body: '<p>place blog post here</p>',
+                …
+            }
+            `;
+            contentText = await model.generateContent(prompt);
+            
+
+
+        } else if (contentType === 'updates') {
+            const prompt = `Generate a paragraph and title with no hashtags that I can post to social media. The generate paragraph should be wrapped in html paragraph element text. For any links generated in your text, please wrap them in text based html anchor elements (<a></a>). Please do no include any hashtags. Base your post on the following text:  \n ${reference}
+            Provide your answer in json in the following format:
+            {
+                title: 'Place title here',
+                body: '<p>place social media post here</p>',
+                …
+            }
+            `;
+            contentText = await model.generateContent(prompt);
+        }
+
+        //convert return JSON into something that can be worked with
+        const jsonRegex = /```json\n([\s\S]*?)\n```/;
+        const match = contentText.response.text().match(jsonRegex);
+        const jsonResult = JSON.parse(match[1].trim());
+        return { success: true, contentText: jsonResult }
+    } catch (error) {
+        return { success: false, error }
+    }
+}
+
 export const getChannelType = async (authKey, channelID) => {
     try {
         //Authorization Header
@@ -205,7 +253,7 @@ export const getChannelType = async (authKey, channelID) => {
  * @param {string} articleImage - url to image for article
  * 
  */
-export const createStaffbaseArticle = async (authKey, channelID, articleTitle, articelBody, imageObject) => {
+export const createStaffbaseArticle = async (authKey, channelID, articleTitle, articelBody, imageObject = '') => {
 
     try {
         //Authorization Header
@@ -242,7 +290,8 @@ export const createStaffbaseArticle = async (authKey, channelID, articleTitle, a
                     image: imageBody,
                     title: articleTitle,
                 }
-            }
+            },
+            published: "now"
         };
         const response = await axios.post(baseUrl, body, { headers });
         return { success: true };
