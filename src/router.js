@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import { handleInputErrors } from './utils/middleware.js';
 import { bulkScrapeLinkedinToStaffbaseArticle, bulkScrapeLinkedinToStaffbaseArticleWithChannels, testRoute} from './handlers/linkedin.js';
 import { generateComments } from './handlers/comments.js';
+import { installations } from './handlers/installations/installations.js';
 
 const router = Router();
 
@@ -17,4 +18,10 @@ router.post('/bulkscrape/linkedin/article',
 //router.post('/generate/comments', generateComments);
 router.post('/generate/test', testRoute);
 router.post('/generate/channels', bulkScrapeLinkedinToStaffbaseArticleWithChannels);
+router.post('/installations', 
+    body('chat').optional().isBoolean().withMessage('Please make sure you are using a boolean value'),
+    body('launchpad').optional().isArray().withMessage('Please make sure you are using a array value'),
+    handleInputErrors,
+    installations);
+
 export default router;

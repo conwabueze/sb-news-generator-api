@@ -224,7 +224,6 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
 
                 articlesString = articlesString + '\n' + `article ${successfulGenCounter}` + '\n' + contentText.contentText.body + '\n';
                 successfulGenCounter++;
-                console.log('here');
             })
         })
 
@@ -274,7 +273,7 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
                 if (articlesIDArr.length > 0) {
                     articlesIDArr.forEach(async articleID => {
                         const article = staffbasePosts[articleID];
-                        if (article.title.length > 0 && article.body.length > 0 && article.image.length > 0) {
+                        if (article && article.title.length > 0 && article.body.length > 0 && article.image.length > 0) {
                             const staffbaseCDNPost = await uploadMediaToStaffbase(sbAuthKey, article.image, 'Gen Photo');
                             const imageObject = staffbaseCDNPost.data.transformations;
                             await createStaffbaseArticle(sbAuthKey, channelID, article.title, article.body, imageObject);
