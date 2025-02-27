@@ -293,8 +293,25 @@ const postGroup = async (sbAuthKey, title, accessorIDs) => {
 
 }
 
-const createJourneyNavigator = async (sbAuthKey, groupId, journeyId) => {
-    const url = `https://app.staffbase.com/api/installations/${journeyId}`;
+const getJourneyNavigator = async (sbAuthKey) => {
+    const url = 'https://app.staffbase.com/api/branch/journeys/navigator';
+
+    const headers = {
+        'Authorization': `Basic ${sbAuthKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+
+    } catch (error) {
+        return { success: false, data: error }
+    }
+}
+
+const postJourneyNavigator = async (sbAuthKey) => {
+    const url = 'https://app.staffbase.com/api/branch/journeys/navigator';
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -303,10 +320,11 @@ const createJourneyNavigator = async (sbAuthKey, groupId, journeyId) => {
 
 
     const payload = {
-        includeExisting: true,
-        journeyType: "joinGroup",
-        multipleExecutions: false,
-        recipientIds: [groupId]
+        localization: {
+            en_US: {
+                title: 'My Tasks'
+            }
+        }
     }
 
     try {
@@ -318,6 +336,22 @@ const createJourneyNavigator = async (sbAuthKey, groupId, journeyId) => {
     }
 }
 
+const getQuickLink = async (sbAuthKey) => {
+    const url = 'https://app.staffbase.com/api/branch/quicklinks/?platform=desktop';
+
+    const headers = {
+        'Authorization': `Basic ${sbAuthKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+
+    } catch (error) {
+        return { success: false, data: error }
+    }
+}
 
 export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourneys) => {
     //Get current list of Journey's and double check if any of the desired Journeys already exist
@@ -385,7 +419,6 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
     });
 
 
-    //If group already exist take id
     for(let journey of desiredJourneys) {
         const journeyName = journey;
         journey = journeysDatabase[journey];
@@ -427,5 +460,34 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
         journeysCreated.push(journey.title);
         
     }
+
+    //Journey Navigator Add
+    let getJourneyNav = await getJourneyNavigator(sbAuthKey);
+    if(!getJourneyNav.success){
+        const postJourneyNav = await postJourneyNavigator(sbAuthKey);
+        if(!postJourneyNav.success)
+            journeysErrors['Journey Navigator'] = 'Error adding Journey Navigator. Please try again. If issue persist, please reach out to manager of this script'
+        else
+            journeysCreated.push('Journey Navigator');
+    }else{
+        journeysNotAddedAlreadyExists.push('Journey Navigator');
+    }
+
+    //Add Journey Navigator to Home Page Quick Link Menu
+    getJourneyNav = await getJourneyNavigator(sbAuthKey);
+    if(getJourneyNav.success){
+        const quicklinks = await getQuickLink(sbAuthKey);
+        if(quicklinks.success){
+            const quicklinkNames = quicklinks.data.data.map(quicklink => {
+                if(quicklink.localization.hasOwnProperty("en_US"))
+                    return quicklink.localization.en_US.name.toLowerCase();
+            });
+        }else{
+    
+        }
+        console.log(quicklinkNames);
+    }
+    
+
     return responseBody;
 }
