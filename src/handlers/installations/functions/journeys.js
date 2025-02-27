@@ -293,6 +293,32 @@ const postGroup = async (sbAuthKey, title, accessorIDs) => {
 
 }
 
+const createJourneyNavigator = async (sbAuthKey, groupId, journeyId) => {
+    const url = `https://app.staffbase.com/api/installations/${journeyId}`;
+
+    const headers = {
+        'Authorization': `Basic ${sbAuthKey}`,
+        'Content-Type': 'application/json'
+    };
+
+
+    const payload = {
+        includeExisting: true,
+        journeyType: "joinGroup",
+        multipleExecutions: false,
+        recipientIds: [groupId]
+    }
+
+    try {
+        const response = await axios.post(url, payload, { headers });
+        return { success: true, data: response.data }
+
+    } catch (error) {
+        return { success: false, data: error }
+    }
+}
+
+
 export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourneys) => {
     //Get current list of Journey's and double check if any of the desired Journeys already exist
     //If it does not exist create the neccessary group, if it does not exist, and create the Journey
@@ -300,7 +326,7 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
     let currentJourneysThatMatchDB = undefined;
     const currentJourneys = await getJourneys(sbAuthKey);
     if (!currentJourneys.success) {
-        return "Error pulling Journeys";
+        return "Error pulling Journeys. Please try again. If issue persist, please reach out to manager of this script";
     }
     else if (currentJourneys.data.total > 0) {
         currentJourneysThatMatchDB = currentJourneys.data.data.map(currJourney => {
@@ -310,10 +336,16 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
             }
         });
     }
-    
-    const responseBody = {};
+
+    const journeysCreated = [];
     const journeysNotAddedAlreadyExists = [];
     const journeysNotAddedNotAOption = [];
+    const journeysErrors = {}
+    const responseBody = {};
+    responseBody['Journeys Created'] = journeysCreated;
+    responseBody['Journey Already Exists'] = journeysNotAddedAlreadyExists;
+    responseBody['This Journey is not a available option to add'] = journeysNotAddedNotAOption;
+    responseBody['Errors'] = journeysErrors;
     const journeysDatabaseKeys = Object.keys(journeysDatabase);
     //Create a final list of what journeys will need to be create
 
@@ -326,7 +358,6 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
             }
             return !currentJourneysThatMatchDB.includes(item)
         });
-        console.log(journeysNotAddedAlreadyExists);
     }
     //if the user wants a specific set of journeys will must cross check and filter what they desire
     else {
@@ -346,6 +377,8 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
 
     //Get groups to see if there are aleady expected group names for the Journeys we need to create
     const currentGroups = await getGroups(sbAuthKey);
+    if (!currentGroups.success)
+        return "Error pulling groups for Journey creation. Please try again. If issue persist, please reach out to manager of this script";
     const groupsTable = {};
     currentGroups.data.data.forEach(group => {
         groupsTable[group.name.toLowerCase()] = group.id;
@@ -353,41 +386,46 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
 
 
     //If group already exist take id
-    desiredJourneys.forEach(async journey => {
+    for(let journey of desiredJourneys) {
+        const journeyName = journey;
         journey = journeysDatabase[journey];
-        console.log(journey.associatedGroup)
-        //if the group already exist just create the journey
+        let groupID = undefined;
         if (groupsTable[journey.associatedGroup.toLowerCase()]) {
-            const groupID = groupsTable[journey.associatedGroup.toLowerCase()];
-            const journeyInstall = await journeyInstallation(sbAuthKey, accessorIDs, journey.title);
-            const setJourneyData = await postJourneySettings(sbAuthKey, groupID, journeyInstall.data.id);
-            //loop through journey content items to add journey steps
-            const journeySteps = Object.keys(journey.content);
-            journeySteps.forEach(async step => {
-                step = journey.content[step];
-                const addJourneyStep = await postJourneyStep(sbAuthKey, journeyInstall.data.id, step.title, step.content,step.teaser,step.image, step.dayOffset,step.timeOfDay,step.notificationChannels);
-                console.log(addJourneyStep);
-            })
-        }
-        //if does not create the group first then the journey
-        else {
+            groupID = groupsTable[journey.associatedGroup.toLowerCase()];
+        } else {
             const createGroup = await postGroup(sbAuthKey, journey.associatedGroup, accessorIDs);
-            const groupID = createGroup.data.id;
-            const journeyInstall = await journeyInstallation(sbAuthKey, accessorIDs, journey.title);
-            const setJourneyData = await postJourneySettings(sbAuthKey, groupID, journeyInstall.data.id);
-            //loop through journey content items to add journey steps
-            const journeySteps = Object.keys(journey.content);
-            journeySteps.forEach(async step => {
-                step = journey.content[step];
-                const addJourneyStep = await postJourneyStep(sbAuthKey, journeyInstall.data.id, step.title, step.content,step.teaser,step.image, step.dayOffset,step.timeOfDay,step.notificationChannels);
-                console.log(addJourneyStep);
-            })
+            if(!createGroup.success){
+                journeysErrors[journey.title] = `Error creating group for ${journey.title} journey. Please try again. If issue persist, please reach out to manager of this script`;
+                continue;
+            }
+            groupID = createGroup.data.id;
         }
-    })
 
-    console.log(journeysNotAddedAlreadyExists);
-    console.log(journeysNotAddedNotAOption);
-    responseBody['Journey Already Exists'] = journeysNotAddedAlreadyExists;
-    responseBody['This Journey is not a available option to add'] = journeysNotAddedNotAOption;
+        const journeyInstall = await journeyInstallation(sbAuthKey, accessorIDs, journey.title);
+        if (!journeyInstall.success) {
+            journeysErrors[journey.title] = `Error installing ${journey.title} journey. Please try again. If issue persist, please reach out to manager of this script`
+            continue;
+        }
+        const setJourneyData = await postJourneySettings(sbAuthKey, groupID, journeyInstall.data.id);
+        if (!setJourneyData.success) {
+            journeysErrors[journey.title] = `Error setting settings for ${journey.title} journey. Please delete journey and try again. If issue persist, please reach out to manager of this script`
+            continue;
+        }
+        //loop through journey content items to add journey steps
+        const journeySteps = Object.keys(journey.content);
+        for(let step of journeySteps){
+            const stepObject = journey.content[step];
+            const addJourneyStep = await postJourneyStep(sbAuthKey, journeyInstall.data.id, stepObject.title, stepObject.content, stepObject.teaser, stepObject.image, stepObject.dayOffset, stepObject.timeOfDay, stepObject.notificationChannels);
+            if (!addJourneyStep.success) {
+                journeysErrors[journey.title] = `Error adding journey step for ${journey.title} journey. Please delete journey and try again. If issue persist, please reach out to manager of this script`
+                if (step === journeySteps[journeySteps.length-1] && journeyName === desiredJourneys[desiredJourneys.length-1]){
+                    return responseBody
+                } 
+                    
+            }
+        }
+        journeysCreated.push(journey.title);
+        
+    }
     return responseBody;
 }
