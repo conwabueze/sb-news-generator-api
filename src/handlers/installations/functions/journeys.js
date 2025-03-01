@@ -353,11 +353,42 @@ const getQuickLink = async (sbAuthKey) => {
     }
 }
 
+const postJourneyNavigatorQuickLink = async (sbAuthKey, accessorIDs) => {
+    const url = 'https://app.staffbase.com/api/branch/quicklinks/';
+
+    const headers = {
+        'Authorization': `Basic ${sbAuthKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    const payload = {
+        "platform": "desktop",
+        "link": "https://app.staffbase.com/journey-navigator",
+        "accessorIds": accessorIDs,
+        "localization": {
+            "en_US": {
+                "name": "My Journey"
+            }
+        },
+        "icon": "\uE85B",
+        "priority": 2
+    }
+
+    try {
+        const response = await axios.post(url, payload, { headers });
+        return { success: true, data: response.data }
+
+    } catch (error) {
+        return { success: false, data: error }
+    }
+}
+
+
 export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourneys) => {
     //Get current list of Journey's and double check if any of the desired Journeys already exist
     //If it does not exist create the neccessary group, if it does not exist, and create the Journey
     let journeysAlreadyExist = false;
-    let currentJourneysThatMatchDB = undefined;
+    let currentJourneysThatMatchDB = [];
     const currentJourneys = await getJourneys(sbAuthKey);
     if (!currentJourneys.success) {
         return "Error pulling Journeys. Please try again. If issue persist, please reach out to manager of this script";
@@ -419,7 +450,7 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
     });
 
 
-    for(let journey of desiredJourneys) {
+    for (let journey of desiredJourneys) {
         const journeyName = journey;
         journey = journeysDatabase[journey];
         let groupID = undefined;
@@ -427,7 +458,7 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
             groupID = groupsTable[journey.associatedGroup.toLowerCase()];
         } else {
             const createGroup = await postGroup(sbAuthKey, journey.associatedGroup, accessorIDs);
-            if(!createGroup.success){
+            if (!createGroup.success) {
                 journeysErrors[journey.title] = `Error creating group for ${journey.title} journey. Please try again. If issue persist, please reach out to manager of this script`;
                 continue;
             }
@@ -446,48 +477,63 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
         }
         //loop through journey content items to add journey steps
         const journeySteps = Object.keys(journey.content);
-        for(let step of journeySteps){
+        for (let step of journeySteps) {
             const stepObject = journey.content[step];
             const addJourneyStep = await postJourneyStep(sbAuthKey, journeyInstall.data.id, stepObject.title, stepObject.content, stepObject.teaser, stepObject.image, stepObject.dayOffset, stepObject.timeOfDay, stepObject.notificationChannels);
             if (!addJourneyStep.success) {
                 journeysErrors[journey.title] = `Error adding journey step for ${journey.title} journey. Please delete journey and try again. If issue persist, please reach out to manager of this script`
-                if (step === journeySteps[journeySteps.length-1] && journeyName === desiredJourneys[desiredJourneys.length-1]){
+                if (step === journeySteps[journeySteps.length - 1] && journeyName === desiredJourneys[desiredJourneys.length - 1]) {
                     return responseBody
-                } 
-                    
+                }
+
             }
         }
         journeysCreated.push(journey.title);
-        
+
     }
 
     //Journey Navigator Add
     let getJourneyNav = await getJourneyNavigator(sbAuthKey);
-    if(!getJourneyNav.success){
-        const postJourneyNav = await postJourneyNavigator(sbAuthKey);
-        if(!postJourneyNav.success)
+    let postJourneyNav = undefined;
+    if (!getJourneyNav.success && getJourneyNav.data.status === 404) {
+        postJourneyNav = await postJourneyNavigator(sbAuthKey);
+        if (!postJourneyNav.success)
             journeysErrors['Journey Navigator'] = 'Error adding Journey Navigator. Please try again. If issue persist, please reach out to manager of this script'
         else
             journeysCreated.push('Journey Navigator');
-    }else{
+    } else if(!getJourneyNav.success){
+        journeysErrors['Journey Navigator'] = 'Error checking if Journey Navigator. Please try again. If issue persist, please reach out to manager of this script'
+    }
+    else {
         journeysNotAddedAlreadyExists.push('Journey Navigator');
+        postJourneyNav = {success:true};
     }
 
     //Add Journey Navigator to Home Page Quick Link Menu
-    getJourneyNav = await getJourneyNavigator(sbAuthKey);
-    if(getJourneyNav.success){
+    if (postJourneyNav !== undefined && postJourneyNav.success) {
         const quicklinks = await getQuickLink(sbAuthKey);
-        if(quicklinks.success){
-            const quicklinkNames = quicklinks.data.data.map(quicklink => {
-                if(quicklink.localization.hasOwnProperty("en_US"))
-                    return quicklink.localization.en_US.name.toLowerCase();
+        if (quicklinks.success) {
+            const quicklinkLinks = quicklinks.data.data.map(quicklink => {
+                console.log(quicklink);
+                return quicklink.link;
             });
-        }else{
-    
+
+            //if desktop quicklinks do not have a jounrey navigator link. Create the link
+            if (!quicklinkLinks.includes('https://app.staffbase.com/journey-navigator')) {
+                const journeyNavigator = await postJourneyNavigatorQuickLink(sbAuthKey,accessorIDs);
+                if(!journeyNavigator.success)
+                    journeysErrors['Journey Navigator Quicklink'] = 'Error adding Journey Navigator Quicklink. Please try again. If issue persist, please reach out to manager of this script'
+                else
+                    journeysCreated.push('Journey Navigator Quicklink');
+
+            }else{
+                journeysNotAddedAlreadyExists.push('Journey Navigator Quicklink');
+            }
+        } else {
+            journeysErrors['Journey Navigator Quick'] = 'Error getting Quicklinks. Please try again. If issue persist, please reach out to manager of this script'
         }
-        console.log(quicklinkNames);
     }
-    
+
 
     return responseBody;
 }
