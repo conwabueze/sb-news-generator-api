@@ -15,7 +15,8 @@ export const chatInstallation = async (sbAuthKey, accessorIDs) => {
                 en_US: {
                     title: "Chat"
                 }
-            }
+            },
+            icon: "D"
         },
         pluginID: "chat",
         published: "now"

@@ -19,8 +19,10 @@ router.post('/bulkscrape/linkedin/article',
 router.post('/generate/test', testRoute);
 router.post('/generate/channels', bulkScrapeLinkedinToStaffbaseArticleWithChannels);
 router.post('/installations', 
-    body('chat').optional().isBoolean().withMessage('Please make sure you are using a boolean value'),
-    body('launchpad').optional().isArray().withMessage('Please make sure you are using a array value'),
+    body('chat').optional().isBoolean().withMessage('Please make sure you are using a boolean value for chat'),
+    body('launchpad').optional().isArray().withMessage('Please make sure you are using a array value for launchpad'),
+    body('journeys').optional().isObject().withMessage('Please make sure you are using a Object for journeys'),
+    body('microsoft').optional().isBoolean().withMessage('Please make sure you are using a boolean value for microsoft'),
     handleInputErrors,
     installations);
 

@@ -4,6 +4,8 @@ import { JSDOM } from 'jsdom';
 import { chatInstallation } from "./functions/chat.js";
 import { launchpadInstallation } from "./functions/launchpad.js";
 import { journeysInstallation } from "./functions/journeys.js";
+import { microsoftInstallation } from "./functions/microsoft.js";
+import { campaignsInstallation } from "./functions/campaigns.js";
 
 const getInstallations = async (sbAuthKey, accessorIDs) => {
 
@@ -60,6 +62,23 @@ const getForms = async (sbAuthKey) => {
 
 }
 
+const spaceCheck = async (sbAuthKey) => {
+    const url = 'https://app.staffbase.com/api/spaces';
+
+    const headers = {
+        'Authorization': `Basic ${sbAuthKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        return { success: false, data: error }
+    }
+
+}
+
 const getPages = async (sbAuthKey) => {
     const url = 'https://app.staffbase.com/api/pages';
 
@@ -79,10 +98,17 @@ const getPages = async (sbAuthKey) => {
 
 export const installations = async (req, res, next) => {
     const scriptResponse = {};
+
+    //request data
     const sbAuthKey = req.headers.authorization.split(' ')[1];
     const chat = req.body.hasOwnProperty("chat") ? req.body.chat : undefined;
     const launchpad = req.body.hasOwnProperty("chat") ? req.body.launchpad : undefined;
     const journeys = req.body.hasOwnProperty("journeys") ? req.body.journeys : undefined;
+    const microsoft = req.body.hasOwnProperty("microsoft") ? req.body.microsoft : undefined;
+
+    const sp = await spaceCheck(sbAuthKey);
+    console.log(sp);
+
     const spaces = await getSBSpaces(sbAuthKey);
     //for some reason pulling spaces with a wrong permission token does not return a auth error, just undefined
     if (spaces.success && spaces.data === undefined) {
@@ -101,7 +127,7 @@ export const installations = async (req, res, next) => {
         return plugin.pluginID;
     })
 
-    if (chat !== undefined) {
+    if (chat === true) {
         //if chat is not installed, install it
         if (!pluginIDs.includes('chat')) {
             const installChat = await chatInstallation(sbAuthKey, accessorIDs);
@@ -126,13 +152,32 @@ export const installations = async (req, res, next) => {
     }
     if (launchpad !== undefined) {
         const launchpadInstall = await launchpadInstallation(sbAuthKey, accessorIDs, launchpad);
-        scriptResponse['launchpage'] = launchpadInstall
+        scriptResponse['launchpad'] = launchpadInstall
     }
 
     if (journeys !== undefined) {
-        const journeysInstall = await journeysInstallation(sbAuthKey,accessorIDs,journeys);
-        scriptResponse['journeys'] = journeysInstall;
+        if(!journeys["user"])
+            scriptResponse['journeys'] = 'Error: Please make sure you provide a "user" key in your Journey JSON';
+        else if(!journeys["user"])
+            scriptResponse['journeys'] = 'Error: Please make sure you provide a "desired" key in your Journey JSON';
+        else if(typeof journeys["user"] !== "string")
+            scriptResponse['journeys'] = 'Error: Please make sure you provide a string as the value for "user" in your Journey JSON';
+        else if(!Array.isArray(journeys["desired"]))
+            scriptResponse['journeys'] = 'Error: Please make sure you provide an Array as the value for "desired" in your Journey JSON';
+        else{
+            const journeysInstall = await journeysInstallation(sbAuthKey,accessorIDs,journeys["desired"],journeys["user"]);
+            scriptResponse['journeys'] = journeysInstall;
+        }
+        
     }
+
+    if(microsoft === true){
+        const microsoftInstall = await microsoftInstallation(sbAuthKey);
+        scriptResponse['microsoft'] = microsoftInstall;
+    }
+
+    //const campaignInsalls = await campaignsInstallation(sbAuthKey);
+
     res.status(200).json(scriptResponse);
 
     //update all pages that have incorrect survey ids

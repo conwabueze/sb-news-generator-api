@@ -102,6 +102,18 @@ const applicationDatabase = {
         url: 'https://workspace.google.com/products/sheets/',
         description: 'Sheets, Database, Data, Data Management',
         image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Google_Sheets_2020_Logo.svg/512px-Google_Sheets_2020_Logo.svg.png'
+    },
+    travelperk: {
+        title: 'Travelperk',
+        url: 'https://www.travelperk.com/',
+        description: 'Travel, Expenses',
+        image: 'https://play-lh.googleusercontent.com/fje71aZ6jMNWsWuIGmkealWptgM90xetbUgAPBNnZ2ighWqCYLpJjNogEZR8ar_2UCse'
+    },
+    jira: {
+        title: 'Jira',
+        url: 'https://jira.com',
+        description: 'Ticketing',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZ3jgHFfaTrS0P36OtkWQwMtRShBYoVXIVug&s'
     }
 
 }
