@@ -106,9 +106,6 @@ export const installations = async (req, res, next) => {
     const journeys = req.body.hasOwnProperty("journeys") ? req.body.journeys : undefined;
     const microsoft = req.body.hasOwnProperty("microsoft") ? req.body.microsoft : undefined;
 
-    const sp = await spaceCheck(sbAuthKey);
-    console.log(sp);
-
     const spaces = await getSBSpaces(sbAuthKey);
     //for some reason pulling spaces with a wrong permission token does not return a auth error, just undefined
     if (spaces.success && spaces.data === undefined) {
@@ -176,7 +173,7 @@ export const installations = async (req, res, next) => {
         scriptResponse['microsoft'] = microsoftInstall;
     }
 
-    //const campaignInsalls = await campaignsInstallation(sbAuthKey);
+    const campaignInsalls = await campaignsInstallation(sbAuthKey);
 
     res.status(200).json(scriptResponse);
 

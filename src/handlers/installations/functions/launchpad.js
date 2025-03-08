@@ -62,7 +62,7 @@ const applicationDatabase = {
         image: 'https://cdn.freebiesupply.com/logos/large/2x/slack-logo-icon.png'
     },
     zoom: {
-        title: 'zoom',
+        title: 'Zoom',
         url: 'https://zoom.us/signin',
         description: 'Video meeting, livestream',
         image: 'https://t4.ftcdn.net/jpg/03/75/33/61/360_F_375336103_KQSAG9rQuOgdSx01GNIPK9abZaIeGoGR.jpg'
