@@ -17,12 +17,13 @@ router.post('/bulkscrape/linkedin/article',
 
 //router.post('/generate/comments', generateComments);
 router.post('/generate/test', testRoute);
-router.post('/generate/channels', bulkScrapeLinkedinToStaffbaseArticleWithChannels);
+router.post('/generate/channels', bulkScrapeLinkedinToStaffbaseArticle);
 router.post('/installations', 
     body('chat').optional().isBoolean().withMessage('Please make sure you are using a boolean value for chat'),
     body('launchpad').optional().isArray().withMessage('Please make sure you are using a array value for launchpad'),
     body('journeys').optional().isObject().withMessage('Please make sure you are using a Object for journeys'),
     body('microsoft').optional().isBoolean().withMessage('Please make sure you are using a boolean value for microsoft'),
+    body('campaigns').optional().isBoolean().withMessage('Please make sure you are using a boolean value for campaigns'),
     handleInputErrors,
     installations);
 

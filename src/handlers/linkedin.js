@@ -275,6 +275,9 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
                         const article = staffbasePosts[articleID];
                         if (article && article.title.length > 0 && article.body.length > 0 && article.image.length > 0) {
                             const staffbaseCDNPost = await uploadMediaToStaffbase(sbAuthKey, article.image, 'Gen Photo');
+                            if(!staffbaseCDNPost.success){
+                                return;
+                            }
                             const imageObject = staffbaseCDNPost.data.transformations;
                             await createStaffbaseArticle(sbAuthKey, channelID, article.title, article.body, imageObject);
                             console.log(`Article ${articleID} has been added to channel ${channelName}`)

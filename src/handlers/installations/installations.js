@@ -6,6 +6,8 @@ import { launchpadInstallation } from "./functions/launchpad.js";
 import { journeysInstallation } from "./functions/journeys.js";
 import { microsoftInstallation } from "./functions/microsoft.js";
 import { campaignsInstallation } from "./functions/campaigns.js";
+import { customWidgetsInstallation } from "./functions/customWidgets.js";
+import { mobileQuickLinkInstallation } from "./functions/mobileQuickLinks.js";
 
 const getInstallations = async (sbAuthKey, accessorIDs) => {
 
@@ -105,6 +107,10 @@ export const installations = async (req, res, next) => {
     const launchpad = req.body.hasOwnProperty("chat") ? req.body.launchpad : undefined;
     const journeys = req.body.hasOwnProperty("journeys") ? req.body.journeys : undefined;
     const microsoft = req.body.hasOwnProperty("microsoft") ? req.body.microsoft : undefined;
+    const campaigns = req.body.hasOwnProperty("campaigns") ? req.body.campaigns : undefined;
+    const customWidgets = req.body.hasOwnProperty("customWidgets") ? req.body.customWidgets : undefined;
+    const mobileQuickLinks = req.body.hasOwnProperty("mobileQuickLinks") ? req.body.mobileQuickLinks : undefined;
+
 
     const spaces = await getSBSpaces(sbAuthKey);
     //for some reason pulling spaces with a wrong permission token does not return a auth error, just undefined
@@ -172,8 +178,17 @@ export const installations = async (req, res, next) => {
         const microsoftInstall = await microsoftInstallation(sbAuthKey);
         scriptResponse['microsoft'] = microsoftInstall;
     }
+    if(campaigns === true){
+        const campaignInsalls = await campaignsInstallation(sbAuthKey);
+        scriptResponse['campaigns'] = campaignInsalls;
+    }
+    if(mobileQuickLinks !== undefined){
+        const menuInstall = await mobileQuickLinkInstallation(sbAuthKey,accessorIDs,mobileQuickLinks);
+    }
 
-    const campaignInsalls = await campaignsInstallation(sbAuthKey);
+    // if(customWidgets[0]==="all"){
+    //     const customWidgetsInstall = customWidgetsInstallation(sbAuthKey);
+    // }
 
     res.status(200).json(scriptResponse);
 
