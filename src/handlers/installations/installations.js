@@ -8,6 +8,7 @@ import { microsoftInstallation } from "./functions/microsoft.js";
 import { campaignsInstallation } from "./functions/campaigns.js";
 import { customWidgetsInstallation } from "./functions/customWidgets.js";
 import { mobileQuickLinkInstallation } from "./functions/mobileQuickLinks.js";
+import { hrIntegrationInstallation } from "./functions/hrIntegrations.js";
 
 const getInstallations = async (sbAuthKey, accessorIDs) => {
 
@@ -110,6 +111,7 @@ export const installations = async (req, res, next) => {
     const campaigns = req.body.hasOwnProperty("campaigns") ? req.body.campaigns : undefined;
     const customWidgets = req.body.hasOwnProperty("customWidgets") ? req.body.customWidgets : undefined;
     const mobileQuickLinks = req.body.hasOwnProperty("mobileQuickLinks") ? req.body.mobileQuickLinks : undefined;
+    const hrIntegrations = req.body.hasOwnProperty("hrIntegrations") ? req.body.hrIntegrations : undefined;
 
 
     const spaces = await getSBSpaces(sbAuthKey);
@@ -159,31 +161,83 @@ export const installations = async (req, res, next) => {
     }
 
     if (journeys !== undefined) {
-        if(!journeys["user"])
+        if (!journeys["user"])
             scriptResponse['journeys'] = 'Error: Please make sure you provide a "user" key in your Journey JSON';
-        else if(!journeys["user"])
+        else if (!journeys["user"])
             scriptResponse['journeys'] = 'Error: Please make sure you provide a "desired" key in your Journey JSON';
-        else if(typeof journeys["user"] !== "string")
+        else if (typeof journeys["user"] !== "string")
             scriptResponse['journeys'] = 'Error: Please make sure you provide a string as the value for "user" in your Journey JSON';
-        else if(!Array.isArray(journeys["desired"]))
+        else if (!Array.isArray(journeys["desired"]))
             scriptResponse['journeys'] = 'Error: Please make sure you provide an Array as the value for "desired" in your Journey JSON';
-        else{
-            const journeysInstall = await journeysInstallation(sbAuthKey,accessorIDs,journeys["desired"],journeys["user"]);
+        else {
+            const journeysInstall = await journeysInstallation(sbAuthKey, accessorIDs, journeys["desired"], journeys["user"]);
             scriptResponse['journeys'] = journeysInstall;
         }
-        
+
     }
 
-    if(microsoft === true){
+    if (microsoft === true) {
         const microsoftInstall = await microsoftInstallation(sbAuthKey);
         scriptResponse['microsoft'] = microsoftInstall;
     }
-    if(campaigns === true){
+    if (campaigns === true) {
         const campaignInsalls = await campaignsInstallation(sbAuthKey);
         scriptResponse['campaigns'] = campaignInsalls;
     }
-    if(mobileQuickLinks !== undefined){
-        const menuInstall = await mobileQuickLinkInstallation(sbAuthKey,accessorIDs,mobileQuickLinks);
+    if (mobileQuickLinks !== undefined) {
+        const mobileQuickLinksObjectKeys = Object.keys(mobileQuickLinks);
+        console.log(mobileQuickLinksObjectKeys);
+        let looksGood = true;
+        for (const key of mobileQuickLinksObjectKeys) {
+            if (typeof mobileQuickLinks[key] !== 'object') {
+                scriptResponse['mobile quicklinks'] = 'Error: Please make sure each mobile link object key is a object';
+                console.log('in here');
+                looksGood = false;
+                break;
+            }
+            else if (!mobileQuickLinks[key].hasOwnProperty("title")) {
+                scriptResponse['mobile quicklinks'] = 'Error: Please make sure each mobile link object has a "title" key';
+                looksGood = false;
+                break;
+            }
+            else if (!mobileQuickLinks[key].hasOwnProperty("position")) {
+                scriptResponse['mobile quicklinks'] = 'Error: Please make sure each mobile link object has a "position" key';
+                looksGood = false;
+                break;
+            }
+            else if (typeof mobileQuickLinks[key]["title"] !== "string") {
+                scriptResponse['mobile quicklinks'] = 'Error: Please make sure "title" key is a string';
+                looksGood = false;
+                break;
+            }
+            else if (typeof mobileQuickLinks[key]["position"] !== "number") {
+                scriptResponse['mobile quicklinks'] = 'Error: Please make sure "position" key is a number';
+                looksGood = false;
+                break;
+            }
+        }
+        if (looksGood) {
+            const menuInstall = await mobileQuickLinkInstallation(sbAuthKey, accessorIDs, mobileQuickLinks);
+            scriptResponse['mobile quicklinks'] = menuInstall;
+        }
+    }
+    if(customWidgets !== undefined){
+        if(customWidgets.length !== 2){
+            scriptResponse['mobile quicklinks'] = 'Error: Please make sure your array has only two values [email, password]';
+        }else if(typeof customWidgets[0] !== 'string' || typeof customWidgets[1] !== 'string'){
+            scriptResponse['mobile quicklinks'] = 'Error: Please make sure your array is only using string values';
+        }else{
+            const customWidgetsInstall = await customWidgetsInstallation(customWidgets[0], customWidgets[1]);
+            if(customWidgetsInstall === false)
+                scriptResponse['mobile quicklinks'] = `Error: some sort of issue is going on here. Make sure you are using the correct creds and try again. If issue persist, please reach out to the manager of this script`;
+            else
+                scriptResponse['mobile quicklinks'] = 'success';
+        }
+        
+    }
+    if(hrIntegrations !== undefined){
+       const hrIntegrationsInstall = await hrIntegrationInstallation(hrIntegrations[0],hrIntegrations[1]);
+       console.log('hello');
     }
 
     // if(customWidgets[0]==="all"){
