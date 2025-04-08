@@ -26,6 +26,7 @@ router.post('/installations',
     body('campaigns').optional().isBoolean().withMessage('Please make sure you are using a boolean value for campaigns'),
     body('mobileQuickLinks').optional().isObject().withMessage('Please make sure you are using a Object for mobileQuickLinks'),
     body('customWidgets').optional().isArray().withMessage('Please make sure you are using a array value for customWidgets'),
+    body('workdayMerge').optional().isArray().withMessage('Please make sure you are using a array value for workdayMerge'),
     handleInputErrors,
     installations);
 

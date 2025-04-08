@@ -1,5 +1,24 @@
 import axios from 'axios';
 
+/**
+ * @async
+ * @function activateMicrosoftConnection
+ * @description Activates the default Microsoft 365 integration for the current Staffbase branch.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after attempting
+ * to activate the Microsoft connection.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught
+ * and returned within the promise).
+ */
 const activateMicrosoftConnection = async (sbAuthKey) => {
     const url = 'https://app.staffbase.com/api/branch/integrations/';
 
@@ -27,6 +46,24 @@ const activateMicrosoftConnection = async (sbAuthKey) => {
     }
 }
 
+/**
+ * @async
+ * @function addM365Features
+ * @description Adds a specific Microsoft 365 feature to the Staffbase integration.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string} id - The identifier of the Microsoft 365 feature to be added. This ID is specific to the feature within the Staffbase M365 integration.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after attempting to add the M365 feature.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
 const addM365Features = async (sbAuthKey, id) => {
     const url = 'https://app.staffbase.com/api/branch/integrations/ms365/features';
 
@@ -48,7 +85,23 @@ const addM365Features = async (sbAuthKey, id) => {
         return { success: false, data: error }
     }
 }
-export const microsoftInstallation = async (sbAuthKey, accessorIDs, desiredJourneys, userId) => {
+
+/**
+ * @async
+ * @function microsoftInstallation
+ * @description Installs various Microsoft 365 features into a Staffbase environment.
+ * It first attempts to activate the Microsoft connection and then iterates through a predefined list of feature IDs to add them.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key. This should be a base64 encoded string of your API credentials.
+ *
+ * @returns {Promise<object|string>} - A promise that resolves to either:
+ * - An object containing the installation status of each Microsoft 365 feature, with keys:
+ * - `"features added"`: An array of feature IDs that were successfully added.
+ * - `"features already exist"`: An array of feature IDs that were already present.
+ * - `"errors"`: An object where keys are feature IDs that encountered an error during addition, and values are the corresponding error messages.
+ * - A string error message if there was an issue activating the Microsoft connection.
+ */
+export const microsoftInstallation = async (sbAuthKey) => {
     let responseBody = {
         "features added": [],
         "features already exist": [],

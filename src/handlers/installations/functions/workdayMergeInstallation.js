@@ -1,0 +1,166 @@
+import puppeteer from 'puppeteer';
+
+export const workdayMergeInstallation = async (email, password) => {
+    let browser = undefined;
+    try {
+        let browser = await puppeteer.launch({ headless: false, defaultViewport: null }); // Set headless to false to see the browser
+        const page = await browser.newPage();
+
+        //sign in to studio
+        await page.goto('https://app.staffbase.com/studio', {
+            waitUntil: 'networkidle0', // or 'load'
+            timeout: 60000, // 60 seconds
+        });
+        await page.waitForSelector('input[name="identifier"]');
+        await page.click('input[name="identifier"]');
+        await page.type('input[name="identifier"]', email);
+        await page.waitForSelector('input[name="secret"]');
+        await page.click('input[name="secret"]');
+        await page.type('input[name="secret"]', password);
+        await page.waitForSelector('button[type="submit"]');
+        await page.click('button[type="submit"]');
+
+
+        await page.goto('https://app.staffbase.com/studio/settings/extensions/hr-integrations');
+        await page.waitForSelector('button[data-testid="merge-dev-extensions-card__add-btn"]');
+        await page.click('button[data-testid="merge-dev-extensions-card__add-btn"]');
+        await page.waitForSelector('img[alt="Workday"]');
+        await page.click('img[alt="Workday"]');
+        await page.waitForSelector('button.ds-modal__button--accept');
+        await page.click('button.ds-modal__button--accept');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // await page.waitForSelector('button.ds-modal__button--accept');
+        // await page.click('button.ds-modal__button--accept');
+        // await new Promise(resolve => setTimeout(resolve, 5000));
+
+        // //Get Merge iFrame
+        // const iframeElement = await page.$('#merge-link-iframe');
+        // if (!iframeElement) {
+        //     console.log('Error getting iFrame');
+        // }
+        // //Get content from iFrame
+        // const iframeContentFrame = await iframeElement.contentFrame();
+        // if (!iframeContentFrame) {
+        //     console.log('Error getting content iFrame ')
+        // }
+
+        // //Click on 'Use my Workday credentials and also provide OAuth credentials.' button
+        // let selector = '.text-base';
+        // const targetInnerHTML = "Use my Workday credentials and also provide OAuth credentials.";
+        // await iframeContentFrame.evaluate((selector, targetText) => {
+        //     const elements = document.querySelectorAll(selector);
+        //     for (const element of elements) {
+        //         if (element.innerHTML.trim() === targetText.trim()) {
+        //             element.click();
+        //             return true; // Indicate that the element was found and clicked
+        //         }
+        //     }
+        //     return false; // Indicate that no matching element was found
+        // }, selector, targetInnerHTML);
+        
+        
+        // await new Promise(resolve => setTimeout(resolve, 5000));
+
+        // //click I am an admin button
+        // selector = '#custom-button';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // //click next
+        // selector = '#requested-data-custom-button';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // //add web services endpoint URL
+        // selector = 'input[placeholder="URL"]';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+        // await iframeContentFrame.type(selector, process.env.WORKDAY_URL.replace(/'/g, ''));
+
+        // //click next 
+        // selector = '#custom-button';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // //add Enter the credentials for the ISU
+        // selector = 'input[placeholder="Username"]';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+        // await iframeContentFrame.type(selector, process.env.WORKDAY_USERNAME.replace(/'/g, ''));
+        // selector = 'input[placeholder="Password"]';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+        // await iframeContentFrame.type(selector, process.env.WORKDAY_PASSWORD.replace(/'/g, ''));
+
+        // //click next 
+        // selector = '#custom-button';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // //add Enter your tenant name
+        // selector = 'input[placeholder="Enter value"]';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+        // await iframeContentFrame.type(selector, process.env.WORKDAY_TENANT_NAME.replace(/'/g, ''));
+
+        // //click next
+        // selector = '#custom-button';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // //add Enter your tenant name
+        // selector = 'input[placeholder="Client ID"]';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+        // await iframeContentFrame.type(selector, process.env.WORKDAY_CLIENT_ID.replace(/'/g, ''));
+        // selector = 'input[placeholder="Client secret"]';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+        // await iframeContentFrame.type(selector, process.env.WORKDAY_CLIENT_SECRET.replace(/'/g, ''));
+
+        // //click next
+        // selector = '#custom-button';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // //add Enter your refresh token and token URL
+        // selector = 'input[placeholder="Workday OAuth token URL"]';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+        // await iframeContentFrame.type(selector, process.env.WORKDAY_TOKEN_ENDPOINT.replace(/'/g, ''));
+        // selector = 'input[placeholder="Workday Refresh token"]';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+        // await iframeContentFrame.type(selector, process.env.WORKDAY_REFRESH_TOKEN.replace(/'/g, ''));
+
+        // //click next
+        // selector = '#custom-button';
+        // await iframeContentFrame.waitForSelector(selector);
+        // await iframeContentFrame.click(selector);
+
+        // await new Promise(resolve => setTimeout(resolve, 5000));
+
+        // //close browser
+        // await browser.close();
+        // return 'Workday Integration has been successfully added';
+
+
+    } catch (error) {
+        if(browser !== undefined)
+            await browser.close();
+        return 'ERROR: There was a issue running the workday integration. Run this script again and if issue keeps persisting please reachout to the manager of this script';
+    }
+}

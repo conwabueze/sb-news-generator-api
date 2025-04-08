@@ -1,4 +1,6 @@
 import axios from 'axios';
+
+//Object storing all possible journey options to add to an environment
 const journeysDatabase = {
     onboarding: {
         title: 'Onboarding',
@@ -68,6 +70,22 @@ const journeysDatabase = {
     }
 }
 
+/**
+ * @async
+ * @function getJourneys
+ * @description Retrieves a list of installations of the 'journeys' plugin across all spaces that are administered by the authenticated user in Staffbase.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key. 
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the data returned by the Staffbase API, which is expected to be a list of 'journeys' plugin installations.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ */
 const getJourneys = async (sbAuthKey) => {
     const url = 'https://app.staffbase.com/api/installations/administrated?pluginID=journeys';
 
@@ -85,8 +103,26 @@ const getJourneys = async (sbAuthKey) => {
 
 }
 
-//Install Journeys
-const journeyInstallation = async (sbAuthKey, accessorIDs, title) => {
+/**
+ * @async
+ * @function createJourney
+ * @description Creates a new journey installation within a specific Staffbase space.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key. This should be a base64 encoded string of your API credentials.
+ * @param {string[]} accessorIDs - An array of accessor IDs that will have access to this journey installation. The function uses the first element of this array to construct the API endpoint for the space.
+ * @param {string} title - The desired title for the new journey. This title will be used in the English (US) localization.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after creating the journey, including the journey's ID.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
+const createJourney = async (sbAuthKey, accessorIDs, title) => {
     const installationsURL = `https://app.staffbase.com/api/spaces/${accessorIDs[0]}/installations`;
 
     const headers = {
@@ -110,15 +146,37 @@ const journeyInstallation = async (sbAuthKey, accessorIDs, title) => {
     try {
         //create journey
         const response = await axios.post(installationsURL, payload, { headers });
-        const journeyId = response.data.id;
         return { success: true, data: response.data }
     } catch (error) {
         return { success: false, data: error }
     }
 }
 
+/**
+ * @async
+ * @function createJourneySettings
+ * @description sets settings for a sepcified journey. This includes
+ * 1. What group this jounrey is targeted to (recipientIds: [groupId])
+ * 2. When a person leaves the journey, where do they start.
+ * 3. Who is in the groups starts. New members only or everyone inlcuding already exiting members of the group.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key. This should be a base64 encoded string of your API credentials.
+ * @param {string} groupId - The ID of the Staffbase user group that this journey will be associated with.
+ * @param {string} journeyId - The ID of the Staffbase journey installation to configure.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after creating the journey settings.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
+
 //sets targeted group for Journey, who in groups started it, and if they leave and comeback where do they pick back up
-const postJourneySettings = async (sbAuthKey, groupId, journeyId) => {
+const createJourneySettings = async (sbAuthKey, groupId, journeyId) => {
     const url = `https://app.staffbase.com/api/installations/${journeyId}`;
 
     const headers = {
@@ -143,7 +201,31 @@ const postJourneySettings = async (sbAuthKey, groupId, journeyId) => {
     }
 }
 
-//post journey step
+/**
+ * @async
+ * @function postJourneyStep
+ * @description Creates a new Journey step within a specific Staffbase journey.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string} journeyId - The unique identifier of the journey to which this step will be added.
+ * @param {string} title - The title of the journey step.
+ * @param {string} content - The main content of the journey step. 
+ * @param {string} teaser - A short teaser or summary of the journey step.
+ * @param {string} image - The URL or identifier of an image to be associated with the journey step.
+ * @param {number} dayOffset - The number of days after the journey start date when this step should be triggered (e.g., 0 for the start day, 1 for the next day).
+ * @param {string} timeOfDay - The time of day when this step should be triggered.
+ * @param {string[]} notificationChannels - An array of notification channels through which users should be notified about this step (e.g., ["push"], ["email"]).
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after creating the journey step.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
 const postJourneyStep = async (sbAuthKey, journeyId, title, content, teaser, image, dayOffset, timeOfDay, notificationChannels) => {
     const url = `https://app.staffbase.com/api/branch/journeys/${journeyId}/posts`;
 
@@ -175,7 +257,25 @@ const postJourneyStep = async (sbAuthKey, journeyId, title, content, teaser, ima
 
 }
 
-const publishJourney = async (sbAuthKey, groupId, journeyId) => {
+/**
+ * @async
+ * @function publishJourney
+ * @description Publishes a specific journey within Staffbase, making it visible to users.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string} journeyId - The unique ID of the journey to be published. This ID is used to construct the API endpoint.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after attempting to publish the journey.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
+const publishJourney = async (sbAuthKey, journeyId) => {
     const url = `https://app.staffbase.com/api/installations/${journeyId}`;
 
     const headers = {
@@ -197,6 +297,23 @@ const publishJourney = async (sbAuthKey, groupId, journeyId) => {
     }
 }
 
+/**
+ * @async
+ * @function getGroups
+ * @description Retrieves a list of all groups from the Staffbase platform.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the group data returned by the Staffbase API. This likely includes an array of group objects.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ */
 const getGroups = async (sbAuthKey) => {
     const url = 'https://app.staffbase.com/api/branch/groups';
 
@@ -214,10 +331,27 @@ const getGroups = async (sbAuthKey) => {
 
 }
 
-
-//post a groups seems dependent on the admins default language of the otken we are using.
-//the default lanaguage of the user is expected to be wither German or English
-const postGroup = async (sbAuthKey, title, accessorIDs) => {
+/**
+ * @async
+ * @function postGroup
+ * @description Creates a new group in Staffbase. It sets the group title for both German (de_DE) and English (en_US) localizations.
+ * @remarks This function's behavior for setting the group title is influenced by the default language of the Staffbase user in the Content Languages. 
+ * It assumes the default language is either German or English to ensure the title is correctly applied. If it is not, a error will be produced
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string} title - The desired title for the new group. This title will be used for both German and English localizations.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after creating the group.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
+const postGroup = async (sbAuthKey, title) => {
     const url = 'https://app.staffbase.com/api/branch/groups';
 
     const headers = {
@@ -250,23 +384,25 @@ const postGroup = async (sbAuthKey, title, accessorIDs) => {
 
 }
 
-const getUsers = async (sbAuthKey) => {
-    const url = `https://app.staffbase.com/api/`;
-
-    const headers = {
-        'Authorization': `Basic ${sbAuthKey}`,
-        'Content-Type': 'application/json'
-    };
-
-    try {
-        const response = await axios.get(url, { headers });
-        return { success: true, data: response.data }
-    } catch (error) {
-        return { success: false, data: error }
-    }
-
-}
-
+/**
+ * @async
+ * @function addUserToGroup
+ * @description Adds a specific user to a Staffbase group.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string} groupId - The unique identifier of the Staffbase group to which the user will be added.
+ * @param {string} userId - The unique identifier of the Staffbase user to be added to the group.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after adding the user to the group.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
 const addUserToGroup = async (sbAuthKey, groupId, userId) => {
     const url = `https://app.staffbase.com/api/groups/${groupId}/users`;
 
@@ -286,6 +422,23 @@ const addUserToGroup = async (sbAuthKey, groupId, userId) => {
 
 }
 
+/**
+ * @async
+ * @function getJourneyNavigator
+ * @description Retrieves the Journey Navigator configuration from the Staffbase API.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the Journey Navigator configuration data returned by the Staffbase API.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ */
 const getJourneyNavigator = async (sbAuthKey) => {
     const url = 'https://app.staffbase.com/api/branch/journeys/navigator';
 
@@ -303,6 +456,23 @@ const getJourneyNavigator = async (sbAuthKey) => {
     }
 }
 
+/**
+ * @async
+ * @function postJourneyNavigator
+ * @description Creates a new Journey Navigator entry within Staffbase.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after creating the Journey Navigator entry.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
 const postJourneyNavigator = async (sbAuthKey) => {
     const url = 'https://app.staffbase.com/api/branch/journeys/navigator';
 
@@ -329,6 +499,23 @@ const postJourneyNavigator = async (sbAuthKey) => {
     }
 }
 
+/**
+ * @async
+ * @function getQuickLink
+ * @description Retrieves the quick links configuration for the desktop platform from the Staffbase API.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the quick links data returned by the Staffbase API.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ */
 const getQuickLink = async (sbAuthKey) => {
     const url = 'https://app.staffbase.com/api/branch/quicklinks/?platform=desktop';
 
@@ -346,6 +533,24 @@ const getQuickLink = async (sbAuthKey) => {
     }
 }
 
+/**
+ * @async
+ * @function postJourneyNavigatorQuickLink
+ * @description Creates a new quick link in the Staffbase branch menu that directs users to the Journey Navigator.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string[]} accessorIDs - An array of accessor IDs that will have this quick link available to them in their branch menu.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after creating the quick link.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
 const postJourneyNavigatorQuickLink = async (sbAuthKey, accessorIDs) => {
     const url = 'https://app.staffbase.com/api/branch/quicklinks/';
 
@@ -376,6 +581,24 @@ const postJourneyNavigatorQuickLink = async (sbAuthKey, accessorIDs) => {
     }
 }
 
+/**
+ * @async
+ * @function getToLinksPlugin
+ * @description Retrieves information about the 'link' plugin installation within a specific Staffbase space.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string[]} accessorIDs - An array of accessor IDs. The function uses the first element of this array to specify the target space ID in the API request.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API, which should include information about the 'link' plugin installation.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ */
 const getToLinksPlugin = async (sbAuthKey, accessorIDs) => {
     const url = `https://app.staffbase.com/api/installations/administrated?pluginID=link&spaceIDs=${accessorIDs[0]}`;
 
@@ -393,6 +616,27 @@ const getToLinksPlugin = async (sbAuthKey, accessorIDs) => {
     }
 }
 
+/**
+ * @async
+ * @function postToLinksPlugin
+ * @description Creates a new link installation within a specific Staffbase space using the 'link' plugin.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string[]} accessorIDs - An array of accessor IDs that will have access to this link. The function uses the first element of this array to construct the API endpoint for the space.
+ * @param {string} title - The title that will be displayed for this link in the Staffbase app (in English - US).
+ * @param {string} targetURL - The URL that this link will redirect to when clicked.
+ * @param {string} icon - The icon identifier to be used for this link in the Staffbase app.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after creating the link.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
 const postToLinksPlugin = async (sbAuthKey, accessorIDs, title, targetURL, icon) => {
     const url = `https://app.staffbase.com/api/spaces/${accessorIDs[0]}/installations`;
 
@@ -425,25 +669,24 @@ const postToLinksPlugin = async (sbAuthKey, accessorIDs, title, targetURL, icon)
     }
 }
 
-
+/**
+ * @async
+ * @function journeysInstallation
+ * @description Installs and configures specified journeys for a Staffbase space. It handles checking for existing journeys, creating necessary groups, adding users to groups, creating journey steps, publishing journeys, and adding the Journey Navigator to the home screen and links plugin.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string[]} accessorIDs - An array of accessor IDs. The function likely uses the first element to identify the target space for the journeys.
+ * @param {string[]} desiredJourneys - An array of journey names to be installed. You can also pass `['all']` to install all journeys available in the `journeysDatabase`.
+ * @param {string} userId - The ID of the user who should be added to the associated groups for the created journeys.
+ *
+ * @returns {Promise<object>} - A promise that resolves to an object containing the results of the journey installation process:
+ * - `'Journeys Created'`: An array of journey titles that were successfully created and configured.
+ * - `'Journey Already Exists'`: An array of journey titles that were not created because they already exist in the environment.
+ * - `'This Journey is not a available option to add'`: An array of journey names that were requested but are not found in the `journeysDatabase`.
+ * - `'Errors'`: An object where keys are journey titles or "Journey Navigator" related items, and values are arrays of error messages encountered during the process for that specific item.
+ */
 export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourneys, userId) => {
-    //Get current list of Journey's and double check if any of the desired Journeys already exist
-    //If it does not exist create the neccessary group, if it does not exist, and create the Journey
-    let journeysAlreadyExist = false;
-    let currentJourneysThatMatchDB = [];
-    const currentJourneys = await getJourneys(sbAuthKey);
-    if (!currentJourneys.success) {
-        return "Error pulling Journeys. Please try again. If issue persist, please reach out to manager of this script";
-    }
-    else if (currentJourneys.data.total > 0) {
-        currentJourneysThatMatchDB = currentJourneys.data.data.map(currJourney => {
-            //Assuming that all Journeys have a english title, if the already intalled journey name exist in the DB 
-            if (currJourney.config.localization['en_US'] && journeysDatabase[currJourney.config.localization['en_US'].title.toLowerCase().trim()]) {
-                return currJourney.config.localization['en_US'].title.toLowerCase().trim();
-            }
-        });
-    }
-
+    //response body variables
     const journeysCreated = [];
     const journeysNotAddedAlreadyExists = [];
     const journeysNotAddedNotAOption = [];
@@ -453,21 +696,42 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
     responseBody['Journey Already Exists'] = journeysNotAddedAlreadyExists;
     responseBody['This Journey is not a available option to add'] = journeysNotAddedNotAOption;
     responseBody['Errors'] = journeysErrors;
-    const journeysDatabaseKeys = Object.keys(journeysDatabase);
-    //Create a final list of what journeys will need to be create
 
-    //if the user wants all journeys will must crosscheck and filter the joureys we offer will those that already exist in the env 
+    //Get current list of Journey's and double check if any of the current journeys in the env is also availble in the journeys database.
+    let currentJourneysThatMatchDB = [];
+    const currentJourneys = await getJourneys(sbAuthKey);
+    if (!currentJourneys.success) {
+        return "Error pulling Journeys. Please try again. If issue persist, please reach out to manager of this script";
+    }
+    else if (currentJourneys.data.total > 0) {
+        currentJourneysThatMatchDB = currentJourneys.data.data.map(currJourney => {
+            //Assuming that all Journeys have a english title, check if the already installed journey name exist in the DB 
+            if (currJourney.config.localization['en_US'] && journeysDatabase[currJourney.config.localization['en_US'].title.toLowerCase().trim()]) {
+                return currJourney.config.localization['en_US'].title.toLowerCase().trim();
+            }
+        });
+    }
+
+    //Create a final list of what journeys will need to be create
+    //start by pulling list of journey names from journeysDatabase
+    const journeyNamesInJourneysDatabaseKeys = Object.keys(journeysDatabase);
+    
+
+    //if the user wants all journeys we must crosscheck and filter the joureys we offer with those that already exist in the env 
     if (desiredJourneys[0] === 'all') {
         //filter desired Journeys with ones that already exist in the env
-        desiredJourneys = journeysDatabaseKeys.filter(item => {
+        //the new filtered array is reassigned to desiredJourneys from client request
+        desiredJourneys = journeyNamesInJourneysDatabaseKeys.filter(item => {
             if (currentJourneysThatMatchDB.includes(item)) {
                 journeysNotAddedAlreadyExists.push(item)
             }
             return !currentJourneysThatMatchDB.includes(item)
         });
     }
-    //if the user wants a specific set of journeys will must cross check and filter what they desire
+    //if the user wants a specific set of journeys we must cross check and filter what they desire
     else {
+        //first filter desiredJourneys from client request with journeys in that may already exist in the environment
+        //second filter desireJourneys that dont already exist with journeys the database actually offers.
         desiredJourneys = desiredJourneys.filter(item => {
             if (currentJourneysThatMatchDB.includes(item)) {
                 journeysNotAddedAlreadyExists.push(item)
@@ -475,34 +739,46 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
             //filter and keep any desire journey that does not already exist in the env
             return !currentJourneysThatMatchDB.includes(item)
         }).filter(item => {
-            if (!journeysDatabaseKeys.includes(item))
+            if (!journeyNamesInJourneysDatabaseKeys.includes(item))
                 journeysNotAddedNotAOption.push(item);
             //filter and keep any desired journey that exist in the journeys database
-            return journeysDatabaseKeys.includes(item);
+            return journeyNamesInJourneysDatabaseKeys.includes(item);
         })
     }
 
-    //Get groups to see if there are aleady expected group names for the Journeys we need to create
-    const currentGroups = await getGroups(sbAuthKey);
-    if (!currentGroups.success)
+    //Now that we have a list of items that we are going to add, we can start the process of creating the journey
+
+    //First, we get all groups in the env and there group names to later see if there is already the expected group names to attach to the journey.
+    //if not, we them and atach them to the journey
+    const existingGroups = await getGroups(sbAuthKey);
+    if (!existingGroups.success)
         return "Error pulling groups for Journey creation. Please try again. If issue persist, please reach out to manager of this script";
-    const groupsTable = {};
-    if (currentGroups.data.total > 0) {
-        currentGroups.data.data.forEach(group => {
-            groupsTable[group.name.toLowerCase()] = group.id;
+    const existingGroupsDictionary = {}; //saves (group name : group id) in current env
+    if (existingGroups.data.total > 0) {
+        existingGroups.data.data.forEach(group => {
+            existingGroupsDictionary[group.name.toLowerCase()] = group.id;
         });
     }
 
-
+    //loop through all the journeys the client desires and create them
     for (let journey of desiredJourneys) {
-        const journeyName = journey;
-        journey = journeysDatabase[journey];
-        journeysErrors[journey.title] = [];
+        const journeyName = journey; //save journey name
+        journey = journeysDatabase[journey]; //pull journey data from database
+        journeysErrors[journey.title] = []; //create response array to track errors to later return to client
+
+        //group creation or modifications
         let groupID = undefined;
-        if (groupsTable[journey.associatedGroup.toLowerCase()]) {
-            groupID = groupsTable[journey.associatedGroup.toLowerCase()];
+        //if group needed for journey already exist in the env, add user to group
+        if (existingGroupsDictionary[journey.associatedGroup.toLowerCase()]) {
+            groupID = existingGroupsDictionary[journey.associatedGroup.toLowerCase()];
+            const addUserToJourneyGroup = await addUserToGroup(sbAuthKey, groupID, userId);
+            if (!addUserToJourneyGroup.success) {
+                journeysErrors[journey.title].push(`Error adding user to existing journey group for ${journey.title} journey`);
+            }
             journeysErrors[journey.title].push(`Warning: Group, ${journey.associatedGroup}, for the ${journey.title} Journey already exists. I will proceed to attempt the creation of the Journey with this already existing group.`);
-        } else {
+        } 
+        //if group does not exist, create group and add user
+        else {
             const createGroup = await postGroup(sbAuthKey, journey.associatedGroup, accessorIDs);
             if (!createGroup.success) {
                 journeysErrors[journey.title].push(`Error creating group for ${journey.title} journey. Please try again. If issue persist, please reach out to manager of this script`);
@@ -517,24 +793,29 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
             }
         }
 
-        const journeyInstall = await journeyInstallation(sbAuthKey, accessorIDs, journey.title);
+        //create journey
+        const journeyInstall = await createJourney(sbAuthKey, accessorIDs, journey.title);
         if (!journeyInstall.success) {
             journeysErrors[journey.title].push(`Error installing ${journey.title} journey. Please try again. If issue persist, please reach out to manager of this script`);
             continue;
         }
+
+        //set journey data
         const journeyId = journeyInstall.data.id
-        const setJourneyData = await postJourneySettings(sbAuthKey, groupID, journeyId);
+        const setJourneyData = await createJourneySettings(sbAuthKey, groupID, journeyId);
         if (!setJourneyData.success) {
             journeysErrors[journey.title].push(`Error setting settings for ${journey.title} journey. Please delete journey and try again. If issue persist, please reach out to manager of this script`);
             continue;
         }
-        //loop through journey content items to add journey steps
+
+        //loop through journey content items and add journey steps
         const journeySteps = Object.keys(journey.content);
         for (let step of journeySteps) {
             const stepObject = journey.content[step];
             const addJourneyStep = await postJourneyStep(sbAuthKey, journeyId, stepObject.title, stepObject.content, stepObject.teaser, stepObject.image, stepObject.dayOffset, stepObject.timeOfDay, stepObject.notificationChannels);
             if (!addJourneyStep.success) {
                 journeysErrors[journey.title].push(`Error adding journey step for ${journey.title} journey. Please delete journey and try again. If issue persist, please reach out to manager of this script`);
+                //this is here to monitor if we are at the end of looping through the desired journey and their steps. We return the response body early since there is nothing more we can do here since we are encountering errors.
                 if (step === journeySteps[journeySteps.length - 1] && journeyName === desiredJourneys[desiredJourneys.length - 1]) {
                     return responseBody
                 }
@@ -542,11 +823,13 @@ export const journeysInstallation = async (sbAuthKey, accessorIDs, desiredJourne
             }
         }
 
-        const publish = await publishJourney(sbAuthKey, groupID, journeyId);
+        //publish journey
+        const publish = await publishJourney(sbAuthKey, journeyId);
         if (!publish.success) {
             journeysErrors[journey.title].push(`Warning: there was a issue publishing/activating the ${journey.title} journey. Please go into the studio and publish the journey.`);
         }
 
+        //pushed created journey to response body
         journeysCreated.push(journey.title);
 
     }

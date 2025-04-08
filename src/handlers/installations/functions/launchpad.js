@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+//Object containing all possible launchpad application adds
 const applicationDatabase = {
     sharepoint: {
         title: 'Sharepoint',
@@ -118,6 +119,23 @@ const applicationDatabase = {
 
 }
 
+/**
+ * @async
+ * @function getLaunchpad
+ * @description Retrieves a list of launchpad applications for env in Staffbase.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the launchpad application data returned by the Staffbase API.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ */
 const getLaunchpad = async (sbAuthKey) => {
     const url = 'https://app.staffbase.com/api/branch/launchpad/apps';
 
@@ -134,7 +152,29 @@ const getLaunchpad = async (sbAuthKey) => {
     }
 }
 
-const postAppToLaunchpad = async (sbAuthKey, accessorIDs, appURL, image, title, description) => {
+/**
+ * @async
+ * @function addToLaunchpad
+ * @description Adds a new application to the Staffbase launchpad.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key.
+ * @param {string[]} accessorIDs - An array of accessor IDs that will have access to this launchpad application.
+ * @param {string} appURL - The URL of the application to be added to the launchpad.
+ * @param {string} image - The URL or base64 encoded string of the image to be used as the application's icon on the launchpad.
+ * @param {string} title - The title of the application as it will appear on the launchpad (in English - US).
+ * @param {string} description - A brief description of the application (in English - US).
+ *
+ * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
+ * - If the API call is successful, the object will have:
+ * - `success`: true
+ * - `data`: An object containing the response data from the Staffbase API after adding the application to the launchpad.
+ * - If the API call fails, the object will have:
+ * - `success`: false
+ * - `data`: The error object caught during the API call.
+ *
+ * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ */
+const addToLaunchpad = async (sbAuthKey, accessorIDs, appURL, image, title, description) => {
     const url = 'https://app.staffbase.com/api/branch/launchpad/apps';
 
     const headers = {
@@ -167,13 +207,36 @@ const postAppToLaunchpad = async (sbAuthKey, accessorIDs, appURL, image, title, 
     }
 }
 
+/**
+ * @async
+ * @function launchpadInstallation
+ * @description Manages the installation of applications into a Staffbase launchpad. It can add all available applications or a specific list of desired applications, while also checking for existing applications to avoid duplicates.
+ *
+ * @param {string} sbAuthKey - The Staffbase API authentication key. This should be a base64 encoded string of your API credentials.
+ * @param {string[]} accessorIDs - An array of accessor IDs. The function likely uses the first element to identify the target space for the launchpad.
+ * @param {string[]} desiredApplications - An array of application names to be added to the launchpad. You can also pass `['all']` to add all applications available in the `applicationDatabase`.
+ *
+ * @returns {Promise<object>} - A promise that resolves to an object containing the results of the operation:
+ * - `'Apps Added Successfully'`: An array of application titles that were successfully added to the launchpad.
+ * - `'Apps Added Unsuccessfully'`: An array of application titles that were not added, along with potential reasons (e.g., API error, not found in database).
+ */
 export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredApplications) => {
+    //response body used as return once function is executed
     const responseBody = {};
-    //get current Launchpad items by title
-    const applicationDatabaseKeys = Object.keys(applicationDatabase);
+
+    //start by getting all available applications that can be added to launchpad
+    //we get this by pulling all the keys from the applicationDatabase object which all application names
+    const appsInApplicationDatabase = Object.keys(applicationDatabase);
+
+    //now we get the launchpad from the env in order to later pull on applications living in the launchpad by name
     const launchpad = await getLaunchpad(sbAuthKey);
+
+    //currentLaunchpadApps is the variable used for storing a array of all applications currently luving in the launchpad by name
     let currentLaunchpadApps = undefined;
+
+    //if launchpad data is > 0, we know for sure that their are current applications in the launchpad of the environment
     if (launchpad.data.total > 0) {
+        //loop through launchpad apps and store the app names in an array
         currentLaunchpadApps = launchpad.data.data.map(app => {
             //Grab the key of the first object. In apps content.
             //Example
@@ -188,15 +251,25 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
         })
     }
 
-    /***  Update/Create Launchpad ****/
+    //arrays to keep track of what is added or not added. this will be returned to the client in the response
     const appsAdded = [];
     const appsNotAdded = [];
 
-    //Situation #1: No apps are currently in the launchpad and they want all the applications offerred 
+    //Now it is time to add the neccessary launchpad items
+    /*  
+        NOTE:
+            The map function and Promise.all is used for each of the situations for the response body to return the correct data.
+            forEach was resulting in issues in which the responseBody was not returning the correct data.
+
+        FUTURE NOTE: The situations for adding the launchpadItems could most likely be consolidated in a future
+        improvement of the script if ever needed.
+    */ 
+    //Situation #1: No apps are currently in the launchpad and they want all the applications offerred
+    //loop through application database and add all apps currently available 
     if (currentLaunchpadApps === undefined && desiredApplications[0] === 'all') {
-        const postPromises = applicationDatabaseKeys.map(async currKey => {
-            const currApp = applicationDatabase[currKey];
-            const post = await postAppToLaunchpad(sbAuthKey, accessorIDs, currApp.url, currApp.image, currApp.title, currApp.description);
+        const postPromises = appsInApplicationDatabase.map(async app => {
+            const currApp = applicationDatabase[app];
+            const post = await addToLaunchpad(sbAuthKey, accessorIDs, currApp.url, currApp.image, currApp.title, currApp.description);
             if (!post.success)
                 appsNotAdded.push(currApp.title);
             else
@@ -204,15 +277,17 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
         });
         await Promise.all(postPromises);
     }
+
     //Situation #2: Apps are currently in the launchpad but client want all apps available
+    //filter list of existing apps and apps available to add in the database and then loop through the filter and add the apps to the launchpad
     else if (currentLaunchpadApps !== undefined && desiredApplications[0] === 'all') {
         //filter list of existing apps in application database with apps already existing in the launchpad
-        const filteredArray = applicationDatabaseKeys.filter(item => !currentLaunchpadApps.includes(item));
+        const filteredArray = appsInApplicationDatabase.filter(item => !currentLaunchpadApps.includes(item));
         desiredApplications = filteredArray;
         const postPromises = desiredApplications.map(async desiredApp => {
             const app = applicationDatabase[desiredApp];
 
-            const post = await postAppToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
+            const post = await addToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
             if (!post.success)
                 appsNotAdded.push(app.title);
             else
@@ -223,8 +298,8 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
     }
 
     //Situation #3: No apps are currently in the launchpad and the user wants specific apps to addded
+    //loop all the desired apps and double check if they are available in the applicaiton datebase. if yes, add to the launchpad
     else if (currentLaunchpadApps === undefined && desiredApplications[0] !== 'all') {
-        console.log('Hello world')
         const postPromises = desiredApplications.map(async desiredApp => {
             //if app is not a option in application database
             if (!applicationDatabase[desiredApp]) {
@@ -234,7 +309,7 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
             else {
                 const app = applicationDatabase[desiredApp];
 
-                const post = await postAppToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
+                const post = await addToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
                 if (!post.success)
                     appsNotAdded.push(app.title);
                 else
@@ -243,7 +318,9 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
         });
         await Promise.all(postPromises);
     }
+
     //Situation #4: Apps are currently in the launchpad and the user wants specific apps to addded
+    //filter desired apps with apps currently living in launchpad. once filtered, crosscheck that with the apps in the application database. if available, add the apps to the launchpad
     else if (currentLaunchpadApps !== undefined && desiredApplications[0] !== 'all') {
         //filter the desired applications with what is currently available in the launchpad
         const filteredArray = desiredApplications.filter(item => !currentLaunchpadApps.includes(item));
@@ -255,7 +332,7 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
                 appsNotAdded.push(`${desiredApp} (Not a option at this time)`);
             } else {
                 const app = applicationDatabase[desiredApp];
-                const post = await postAppToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
+                const post = await addToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
                 if (!post.success)
                     appsNotAdded.push(app.title);
                 else
@@ -265,7 +342,10 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
         await Promise.all(postPromises);
     }
 
+    // Populate the response body with the lists of successfully and unsuccessfully added applications.
     responseBody['Apps Added Successfully'] = appsAdded
     responseBody['Apps Added Unsuccessfully'] = appsNotAdded
+
+    // Return results
     return responseBody;
 }
