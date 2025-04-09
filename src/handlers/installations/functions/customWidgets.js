@@ -55,7 +55,8 @@ export const customWidgetsInstallation = async (email, password) => {
         // Launch a new instance of Chrome using Puppeteer.
         // 'headless: true' runs the browser in the background without a GUI.
         // 'defaultViewport: null' sets the viewport to the full screen size.
-        let browser = await puppeteer.launch({ headless: true, defaultViewport: null });
+        browser = await puppeteer.launch({ headless: false, defaultViewport: null });
+
         const page = await browser.newPage(); // Create a new page within the browser.
 
         // --- Step 1: Sign in to Staffbase Studio ---
@@ -93,14 +94,13 @@ export const customWidgetsInstallation = async (email, password) => {
 
         // --- Step 4: Close the browser ---
         await browser.close(); // Close the Puppeteer browser instance.
-        return true; // Return true to indicate that the widget installation process was likely successful.
+        return 'Custom widgets have been succeessfully added'; // Return success message
 
     } catch (error) {
         // --- Error Handling ---
         // If any error occurred during the process, ensure the browser is closed if it was launched.
-        if(browser !== undefined)
+        if(browser)
             await browser.close();
-        console.error("Error during custom widget installation:", error); // Log the error for debugging.
-        return false; // Return false to indicate that an error occurred.
+        return "ERROR: Custom widgets were unsucceessfully added"; // Return false to indicate that an error occurred.
     }
 }

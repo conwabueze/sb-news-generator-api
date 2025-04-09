@@ -6,7 +6,7 @@ import { microsoftInstallation } from "./functions/microsoft.js";
 import { campaignsInstallation } from "./functions/campaigns.js";
 import { customWidgetsInstallation } from "./functions/customWidgets.js";
 import { mobileQuickLinkInstallation } from "./functions/mobileQuickLinks.js";
-import { workdayMergeInstallation } from "./functions/workdayMergInstallation.js";
+import { workdayMergeInstallation } from "./functions/workdayMergeInstallation.js";
 
 
 export const installations = async (req, res, next) => {
@@ -43,8 +43,8 @@ export const installations = async (req, res, next) => {
     if (chat === true) {
         const chatInstall = await chatInstallation(sbAuthKey, accessorIDs);
         scriptResponse['chat'] = chatInstall
-    } 
-    
+    }
+
     //if launchpad is not set to undefined and assuming the correct data is provide in the payload, install the launchpad applications
     if (launchpad !== undefined) {
         const launchpadInstall = await launchpadInstallation(sbAuthKey, accessorIDs, launchpad);
@@ -126,17 +126,20 @@ export const installations = async (req, res, next) => {
             scriptResponse['custom widgets'] = 'Error: Please make sure your array is only using string values';
         } else {
             const customWidgetsInstall = await customWidgetsInstallation(customWidgets[0], customWidgets[1]);
-            if (customWidgetsInstall === false)
-                scriptResponse['custom widgets'] = `Error: some sort of issue is going on here. Make sure you are using the correct creds and try again. If issue persist, please reach out to the manager of this script`;
-            else
-                scriptResponse['custom widgets'] = 'success';
+            scriptResponse['custom widgets'] = customWidgetsInstall
         }
 
     }
 
     if (workdayMerge !== undefined) {
-        const workdayMergeInstall = await workdayMergeInstallation(workdayMerge[0], workdayMerge[1]);
-        scriptResponse['workdayMerge'] = workdayMergeInstall;
+        if (workdayMerge.length !== 3) {
+            scriptResponse['workdayMerge'] = 'Error: Please make sure your array has only three values [email, password, user studio identifier]';
+        } else if (typeof workdayMerge[0] !== 'string' || typeof workdayMerge[1] !== 'string' || typeof workdayMerge[2] !== 'string') {
+            scriptResponse['workdayMerge'] = 'Error: Please make sure your array is only using string values';
+        } else {
+            const workdayMergeInstall = await workdayMergeInstallation(workdayMerge[0], workdayMerge[1], workdayMerge[2]);
+            scriptResponse['workdayMerge'] = workdayMergeInstall;
+        }
     }
 
     res.status(200).json(scriptResponse);
