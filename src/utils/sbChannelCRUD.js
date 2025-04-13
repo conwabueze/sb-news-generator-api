@@ -115,9 +115,11 @@ export const createSBNewsChannel = async (authKey, channelName, accessorIDs = []
 
     try {
         const response = await axios.post(url, data, { headers });
-        return response.data.id;
+        return {success: true, data: response.data.id};
     } catch (error) {
         console.error('Error:', error);
+        return {success: false, data: error};
+
     }
 
 
@@ -154,9 +156,10 @@ export const publishSBNewsChannel = async (authKey, channelID) => {
 
     try {
         const response = await axios.post(url, {}, { headers });
+        return {success: true};
 
     } catch (error) {
-        console.error('Error:', error);
+        return {success: false, data: error};
     }
 }
 

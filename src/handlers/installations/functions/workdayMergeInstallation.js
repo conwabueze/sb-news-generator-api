@@ -3,7 +3,11 @@ import puppeteer from 'puppeteer';
 export const workdayMergeInstallation = async (email, password, userStudioIdentifier) => {
     let browser = undefined;
     try {
-        browser = await puppeteer.launch({ headless: false, defaultViewport: null }); // Set headless to false to see the browser
+        //browser = await puppeteer.launch({ headless: true, defaultViewport: null, args: ['--no-sandbox']  }); // Set headless to false to see the browser
+        browser = await puppeteer.launch({
+            headless: 'new',
+            args: ['--no-sandbox'],
+          });
         const page = await browser.newPage();
 
         //sign in to studio
@@ -17,6 +21,7 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
         await page.waitForSelector('input[name="secret"]');
         await page.click('input[name="secret"]');
         await page.type('input[name="secret"]', password);
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await page.waitForSelector('button[type="submit"]');
         await page.click('button[type="submit"]');
 
@@ -190,6 +195,7 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
     } catch (error) {
         if(browser)
             await browser.close();
+        console.log(error);
         return 'ERROR: There was a issue running the workday integration. Make sure you are entering in the correct creds. Run this script again and if issue keeps persisting please reachout to the manager of this script';
     }
 }

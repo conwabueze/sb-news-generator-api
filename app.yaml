@@ -1,1 +1,7 @@
 runtime: nodejs22
+instance_class: F4
+env_variables:
+  PUPPETEER_CACHE_PATH: ./node_modules/.puppeteer_cache
+handlers:
+  - url: /.*
+    script: auto

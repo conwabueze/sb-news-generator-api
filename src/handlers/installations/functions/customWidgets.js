@@ -55,7 +55,11 @@ export const customWidgetsInstallation = async (email, password) => {
         // Launch a new instance of Chrome using Puppeteer.
         // 'headless: true' runs the browser in the background without a GUI.
         // 'defaultViewport: null' sets the viewport to the full screen size.
-        browser = await puppeteer.launch({ headless: false, defaultViewport: null });
+        //browser = await puppeteer.launch({ headless: true, defaultViewport: null, args: ['--no-sandbox'] });
+        browser = await puppeteer.launch({
+            headless: 'new',
+            args: ['--no-sandbox'],
+          });
 
         const page = await browser.newPage(); // Create a new page within the browser.
 
@@ -70,6 +74,7 @@ export const customWidgetsInstallation = async (email, password) => {
         await page.waitForSelector('input[name="secret"]'); // Wait for the password input field to be present.
         await page.click('input[name="secret"]'); // Click on the password input field to focus it.
         await page.type('input[name="secret"]', password); // Type the provided password into the input field.
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await page.waitForSelector('button[type="submit"]'); // Wait for the submit button to be present.
         await page.click('button[type="submit"]'); // Click the submit button to log in.
 
@@ -101,6 +106,7 @@ export const customWidgetsInstallation = async (email, password) => {
         // If any error occurred during the process, ensure the browser is closed if it was launched.
         if(browser)
             await browser.close();
+        console.log(error);
         return "ERROR: Custom widgets were unsucceessfully added"; // Return false to indicate that an error occurred.
     }
 }

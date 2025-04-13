@@ -5,62 +5,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createSBNewsChannel, deleteSBNewsChannel, getSBNewsChannels, getSBNewsChannelsBranch, getSBPage, getSBSpaces, publishSBNewsChannel, unpublishSBNewsChannel } from "../utils/sbChannelCRUD.js";
 import { JSDOM } from 'jsdom';
 import pLimit from 'p-limit';
-/*
-const precheck = async (req, res, sbAuthKey, numPostsToScrape) => {
-    const sbTest = await createStaffbaseArticle(sbAuthKey, req.body.channelID, 'SB NEWS GEN: Start Up (please Delete this Article)', 'Testing the NEWS API is working. Please ignore this', '');
-    //POST a Test Staffbase Post to ensure everything is good before proceeding
-    if (!sbTest.success) {
-        switch (sbTest.error.status) {
-            case 404:
-                res.status(404).json({ error: 'INCORRECT_CHANNEL_ID', message: `There was an error when creating the Staffbase Article. Please make sure you are using the correct channelID` });
-                return;
-            case 403:
-                res.status(403).json({ error: 'INCORRECT_SB_PERMISSION', message: `There was an error when creating the Staffbase Article. Please make sure you have access to this branch. Your token should have the permission level of Editorial and nothing lower or higher.` });
-                return;
-            case 401:
-                res.status(401).json({ error: 'INCORRECT_SB_AUTH', message: `There was an error when creating the Staffbase Article. Please make sure you are using the correct Staffbase API Token. If yes, ensure that it is not disabled.` });
-                return;
-            default:
-                console.log(sbTest.error);
 
-        }
-    }
-
-    const cookies = await getLinkedinCookies();
-    if (!cookies.success) {
-        res.status(401).json({ error: 'NO_AUTH_COOKIES', message: 'There was an error in retrieving authentication cookies. Sorry for the inconvience. Please reach out to the SE Team to resolve this issue.' });
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No AUTH Cookies, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '');
-        return;
-    }
-
-    const gemTest = await generateArticleText('Write a short story about a robot who dreams of becoming a stand-up comedian. What challenges does it face? What kind of jokes does it tell?');
-    if (!gemTest.success && [400, 403].includes(gemTest.error.status)) {
-        res.status(403).json({ error: 'NO_GEMINI_AUTH', message: `There is an issue with the Gemini Authentication. Please reach out to the SE Team to resolve this issue.` })
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No GEMINI AUTH, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '');
-        console.error(gemTest.error);
-        return;
-    }
-
-    //get linkedin posts
-    const posts = await scrapeLinkedinPostsRawData(cookies.cookies, numPostsToScrape, req.body.pageURL);
-
-    //check if posts are valid before proceeding. If not, return a 400 error
-    if (!posts.success || posts.items.length === 0) {
-        console.log(posts);
-        res.status(400).json(!posts.success
-            ? { error: 'ERROR_PULLING_POSTS', message: `There was an error pulling Linkedln posts. Please reach out to the SE Team to resolve this issue.` }
-            : { error: 'ZERO_POSTS_RETURNED', message: `No posts were returned, please check if you provided a valid Linkedln address and the page your are pulling from have posts with images associated with them. If this is the case, sorry for the inconvience. Please reach out to the admin(s) of this API to resolve this issue.` });
-
-        const errorPostTitle = !posts.success
-            ? 'SB NEWS GEN: Issue Pulling Post, please reach out to admin'
-            : 'SB NEWS GEN: No Posts Returned, please make sure your are entering the correct Company URL. If issue continues, please reach out to admin'
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, errorPostTitle, 'Please delete this article once no longer needed', '');
-        return;
-    }
-
-    return posts;
-}
-*/
 const postFilter = (post) => {
     // Check for required content and early return if missing
     if (!post.content && !post.commentary && !post.socialContent) return;
@@ -104,6 +49,28 @@ const postFilter = (post) => {
 
 }
 
+/**
+ * @function isValidJSON
+ * @description Checks if a given string is a valid JSON string.
+ *
+ * This function attempts to parse the input string using `JSON.parse()`.
+ * If the parsing is successful, it means the string is valid JSON, and the function returns `true`.
+ * If `JSON.parse()` throws an error (e.g., `SyntaxError`) during parsing,
+ * it indicates that the string is not valid JSON, and the function returns `false`.
+ *
+ * @param {string} str The string to be checked for JSON validity.
+ * @returns {boolean} `true` if the string is valid JSON, `false` otherwise.
+ *
+ */
+const isValidJSON = str => {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
 //
 export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
     //payload variables
@@ -119,11 +86,11 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
     let accessorIDs = undefined;
     //perform checks on needed services before proceeding. 
 
-    //check if we have the correct Staffbase Token by making test request
+    //valid that that whatever provided in channelID is something that we can work with
+    //if channelID is none we will valid if they have provided the correct authKey before proceeding. We do this by seeing if we are able to pull spaces from that env and pull the accessorID for the all employee space.
     if (channelID === 'none') {
         const spaces = await getSBSpaces(sbAuthKey);
         if (!spaces.success) {
-            console.log(spaces.error.message);
             switch (spaces.error.status) {
                 case 400:
                     res.status(400).json({ error: 'INVALID_PARAMETER', message: `Invalid parameter detected. Please check your query parameters` });
@@ -134,8 +101,9 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
             }
         }
         accessorIDs = spaces.data[0].accessorIDs;
-        console.log(accessorIDs);
-    } else {
+    }
+    //else would be us assuming they added actual a channelID
+    else {
         const sbTestArticle = await createStaffbaseArticle(sbAuthKey, req.body.channelID, 'SB NEWS GEN: Start Up (please Delete this Article)', 'Testing the NEWS API is working. Please ignore this');
         //POST a Test Staffbase Post to ensure everything is good before proceeding
         if (!sbTestArticle.success) {
@@ -179,7 +147,6 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
 
     //check if posts are valid before proceeding. If not, return a 400 error
     if (!apifyPosts.success || apifyPosts.items.length === 0) {
-        console.log(apifyPosts);
         res.status(400).json(!apifyPosts.success
             ? { error: 'ERROR_PULLING_POSTS', message: `There was an error pulling Linkedln posts. Please reach out to the SE Team to resolve this issue.` }
             : { error: 'ZERO_POSTS_RETURNED', message: `No posts were returned, please check if you provided a valid Linkedln address and the page your are pulling from have posts with images associated with them. If this is the case, sorry for the inconvience. Please reach out to the admin(s) of this API to resolve this issue.` });
@@ -192,29 +159,30 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
     }
     const limit = pLimit(5); // Limit concurrency to 5 requests for request when using map
 
+    //If channel is set to none beign the operation of creating channels and articles based on linkedin posts. 
     if (channelID === 'none') {
-        console.log('will start creating channels')
         const staffbasePosts = {}; //Object will be used as database for all posts  include title & body produced by gemini, image url, and orginal linkedin post url
         let successfulGenCounter = 1; //loop counter/key setter
         let articlesString = ''; //string that will be used to append all article bodies that will be leveraged later to generate channel names
 
         //loops through pulled apify posts
-        const postPromises = apifyPosts.items.map(async (post) => {
+        let postPromises = apifyPosts.items.map(async (post) => {
             return limit(async () => {
                 //filter post to get post with images and gather data needed
                 const filteredPostObject = postFilter(post);
-                if (!filteredPostObject) return;
+                if (!filteredPostObject) return; // if we cant filter post, return blank to skip this iteration.
 
-                //generate text for each post using gemini
+                //generate article text for each post using gemini
                 const contentText = await generateContentText(filteredPostObject.postText, 'articles');
                 if (!contentText.success) {
                     errorsObject.totalErrors++;
                     const key = `error ${errorsObject.totalErrors}`;
                     errorsObject.errorMessages[key] = 'Error generating text from gemini';
-                    return;
+                    return; //if gemini could not generate text, return blank to skip iteration
                 }
 
-                //once we have all info for post, add it as a entry to the object
+                //once we have all info for post, add it as a entry to the Staffbase Post object. This will be used as dictionary featuring a unique
+                //id for each posts that will be later used to map what article should go to which created channel by gemini.
                 staffbasePosts[successfulGenCounter] = {
                     title: contentText.contentText.title,
                     body: contentText.contentText.body,
@@ -222,17 +190,21 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
                     urlToOriginalPost: filteredPostObject.originalPostURL
                 }
 
+                //This is a long string, that operates as document features a list of article text and a unique id attached to it.
+                //this will be fed to gemini in which will ask it to create channels names based on the data and to map the article by its ID to its associated channel
                 articlesString = articlesString + '\n' + `article ${successfulGenCounter}` + '\n' + contentText.contentText.body + '\n';
                 successfulGenCounter++;
             })
         })
 
         try {
-            const results = await Promise.all(postPromises);
+            await Promise.all(postPromises);
         } catch (error) {
-            console.error('Error processing posts:', error);
+            res.status(400).json({ error: "ISSUE_PROCESSING_POST", message: "There was an issue processing posts. Please try again" })
+            return;
         }
 
+        //now that we have all the data that we need from apify we provide that to gemini and create channels and articles based on that data
         try {
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
@@ -250,42 +222,86 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
     Make sure to return your outputted JSON as a string and not in markdown.
             `;
             //ask gemini to create channel names and place article in approiate channels. Return that info in JSON
+            //retry if unsuccessful
             const result = await retryAsyncOperation(async () => {
                 return await model.generateContent(fullPrompt);
             });
 
             let jsonResult = result.response.text();
-            const jsonRegex = /```json\n([\s\S]*?)\n```/;
-            const match = jsonResult.match(jsonRegex);
-            jsonResult = match[1].trim();
-            //Parse JSON String
-            const channelsObject = JSON.parse(jsonResult);
-            console.log(channelsObject);
-            //get generates channel names from JSON
-            const channelNames = Object.keys(channelsObject);
-            for (const channelName of channelNames) {
-                const channelID = await createSBNewsChannel(sbAuthKey, channelName, accessorIDs);
-                await publishSBNewsChannel(sbAuthKey, channelID);
-                console.log(`Channel ${channelName} has been added and published`);
-                const articlesIDArr = channelsObject[channelName];
-                console.log(articlesIDArr.length);
+            // Attempt to parse the Gemini response as JSON. It might be wrapped in markdown.
+            if (jsonResult.indexOf("json") !== -1 && jsonResult.indexOf("```") !== -1) {
+                const jsonRegex = /```json\n([\s\S]*?)\n```/;
+                const match = jsonResult.match(jsonRegex);
+                jsonResult = match[1].trim();
+                jsonResult = JSON.parse(jsonResult);
+            }else if(isValidJSON(jsonResult)){
+                jsonResult = JSON.parse(jsonResult);
+            }else{
+                res.status(400).json({ error: "UNEXPECTED_GEMINI_RETURN", message: "There was a unexpected return in Gemini data. Please try again." })
+                return;
+            }
 
+            const channelsObject = jsonResult;
+            const responseBody = {
+                "Channels Created + Count": {},
+                "Errors": {}
+            }
+            //get generates channel names from returned JSON
+            const channelNames = Object.keys(channelsObject);
+            postPromises = channelNames.map(async channelName => {
+                const createChannel = await createSBNewsChannel(sbAuthKey, channelName, accessorIDs);
+                const errors = []
+                if(!createChannel.success){
+                    errors.push(`Error creating channel ${channelName}`);
+                    return;
+                }
+                //add success to message to response body and success 0 for count.
+                responseBody["Channels Created + Count"][channelName] = 0; 
+                const channelID = createChannel.data;
+
+                const publishChannel = await publishSBNewsChannel(sbAuthKey, channelID);
+                if(!publishChannel.success)
+                    errors.push(`Error publishing channel ${channelName}`);
+
+                //console.log(`Channel ${channelName} has been added and published`);
+                //pull array from Gemini JSON return. The array provides the article IDs for the channel we just created
+                const articlesIDArr = channelsObject[channelName];
+
+                //make sure array has items
                 if (articlesIDArr.length > 0) {
-                    articlesIDArr.forEach(async articleID => {
+                    //loop through ID array and add content to channel in question.
+                    const articlePromises = articlesIDArr.map(async articleID => {
+                        //get article data from posts object
                         const article = staffbasePosts[articleID];
+
+                        //check if there is a actual and that article has all the needed data
                         if (article && article.title.length > 0 && article.body.length > 0 && article.image.length > 0) {
+                            //upload the article images to the SB CDN
                             const staffbaseCDNPost = await uploadMediaToStaffbase(sbAuthKey, article.image, 'Gen Photo');
-                            if(!staffbaseCDNPost.success){
+                            if (!staffbaseCDNPost.success) {
+                                errors.push(`Error adding article Image to Staffbase CDN for channel ${channelName}. Will skip to the next article`);
                                 return;
                             }
                             const imageObject = staffbaseCDNPost.data.transformations;
-                            await createStaffbaseArticle(sbAuthKey, channelID, article.title, article.body, imageObject);
+                            const createArticle = await createStaffbaseArticle(sbAuthKey, channelID, article.title, article.body, imageObject);
+                            if(!createArticle.success){
+                                errors.push(`Error adding article to for channel ${channelName}. Will skip to the next article.`);
+                            }
+                            responseBody["Channels Created + Count"][channelName] = responseBody["Channels Created + Count"][channelName] + 1;
+                            if (errors.length > 0)
+                                responseBody["Errors"] = errors;
                             console.log(`Article ${articleID} has been added to channel ${channelName}`)
                         }
 
                     })
+
+                    await Promise.all(articlePromises);
                 }
-            }
+            });
+            console.log("done")
+            await Promise.all(postPromises);
+            res.status(200).json({ data: responseBody });
+            
         } catch (error) {
             console.log(error)
         }
@@ -446,194 +462,138 @@ const retryAsyncOperation = async (asyncOperation, maxRetries = 3, retryConditio
     return;
 }
 
-export const bulkScrapeLinkedinToStaffbaseArticleWithChannels = async (req, res, next) => {
-    const sbAuthKey = req.headers.authorization.split(' ')[1];
-    const numPostsToScrape = req.body.hasOwnProperty('totalPosts') ? Math.ceil(Number(req.body.totalPosts) * 2) : 1000;
-    const cookies = await getLinkedinCookies();
-    if (!cookies.success) {
-        res.status(401).json({ error: 'NO_AUTH_COOKIES', message: 'There was an error in retrieving authentication cookies. Sorry for the inconvience. Please reach out to the SE Team to resolve this issue.' });
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No AUTH Cookies, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '');
-        return;
-    }
+// export const bulkScrapeLinkedinToStaffbaseArticleWithChannels = async (req, res, next) => {
+//     const sbAuthKey = req.headers.authorization.split(' ')[1];
+//     const numPostsToScrape = req.body.hasOwnProperty('totalPosts') ? Math.ceil(Number(req.body.totalPosts) * 2) : 1000;
+//     const cookies = await getLinkedinCookies();
+//     if (!cookies.success) {
+//         res.status(401).json({ error: 'NO_AUTH_COOKIES', message: 'There was an error in retrieving authentication cookies. Sorry for the inconvience. Please reach out to the SE Team to resolve this issue.' });
+//         await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No AUTH Cookies, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '');
+//         return;
+//     }
 
-    const gemTest = await generateArticleText('Write a short story about a robot who dreams of becoming a stand-up comedian. What challenges does it face? What kind of jokes does it tell?');
-    if (!gemTest.success && [400, 403].includes(gemTest.error.status)) {
-        res.status(403).json({ error: 'NO_GEMINI_AUTH', message: `There is an issue with the Gemini Authentication. Please reach out to the SE Team to resolve this issue.` })
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No GEMINI AUTH, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '');
-        console.error(gemTest.error);
-        return;
-    }
+//     const gemTest = await generateArticleText('Write a short story about a robot who dreams of becoming a stand-up comedian. What challenges does it face? What kind of jokes does it tell?');
+//     if (!gemTest.success && [400, 403].includes(gemTest.error.status)) {
+//         res.status(403).json({ error: 'NO_GEMINI_AUTH', message: `There is an issue with the Gemini Authentication. Please reach out to the SE Team to resolve this issue.` })
+//         await createStaffbaseArticle(sbAuthKey, req.body.channelID, `SB NEWS GEN: No GEMINI AUTH, Please reach out to SE Team to resolve`, 'Please delete this article once no longer needed', '');
+//         console.error(gemTest.error);
+//         return;
+//     }
 
-    //get linkedin posts
-    const apifyPosts = await scrapeLinkedinPostsRawData(cookies.cookies, numPostsToScrape, req.body.pageURL);
+//     //get linkedin posts
+//     const apifyPosts = await scrapeLinkedinPostsRawData(cookies.cookies, numPostsToScrape, req.body.pageURL);
 
-    //check if posts are valid before proceeding. If not, return a 400 error
-    if (!apifyPosts.success || apifyPosts.items.length === 0) {
-        console.log(apifyPosts);
-        res.status(400).json(!apifyPosts.success
-            ? { error: 'ERROR_PULLING_POSTS', message: `There was an error pulling Linkedln posts. Please reach out to the SE Team to resolve this issue.` }
-            : { error: 'ZERO_POSTS_RETURNED', message: `No posts were returned, please check if you provided a valid Linkedln address and the page your are pulling from have posts with images associated with them. If this is the case, sorry for the inconvience. Please reach out to the admin(s) of this API to resolve this issue.` });
+//     //check if posts are valid before proceeding. If not, return a 400 error
+//     if (!apifyPosts.success || apifyPosts.items.length === 0) {
+//         console.log(apifyPosts);
+//         res.status(400).json(!apifyPosts.success
+//             ? { error: 'ERROR_PULLING_POSTS', message: `There was an error pulling Linkedln posts. Please reach out to the SE Team to resolve this issue.` }
+//             : { error: 'ZERO_POSTS_RETURNED', message: `No posts were returned, please check if you provided a valid Linkedln address and the page your are pulling from have posts with images associated with them. If this is the case, sorry for the inconvience. Please reach out to the admin(s) of this API to resolve this issue.` });
 
-        const errorPostTitle = !apifyPosts.success
-            ? 'SB NEWS GEN: Issue Pulling Post, please reach out to admin'
-            : 'SB NEWS GEN: No Posts Returned, please make sure your are entering the correct Company URL. If issue continues, please reach out to admin'
-        await createStaffbaseArticle(sbAuthKey, req.body.channelID, errorPostTitle, 'Please delete this article once no longer needed', '');
-        return;
-    }
+//         const errorPostTitle = !apifyPosts.success
+//             ? 'SB NEWS GEN: Issue Pulling Post, please reach out to admin'
+//             : 'SB NEWS GEN: No Posts Returned, please make sure your are entering the correct Company URL. If issue continues, please reach out to admin'
+//         await createStaffbaseArticle(sbAuthKey, req.body.channelID, errorPostTitle, 'Please delete this article once no longer needed', '');
+//         return;
+//     }
 
-    /*
-    apifyPosts.items.forEach(async (apifyPost) => {
-        const filteredApifyPost = postFilter(apifyPost);
-        const generatedArticle = await generateArticleText(filteredApifyPost.postText);
-        console.log(generatedArticle);
-    })*/
-    const staffbasePosts = {};
-    let articlesString = '';
-    let successfulGenCounter = 1;
+//     /*
+//     apifyPosts.items.forEach(async (apifyPost) => {
+//         const filteredApifyPost = postFilter(apifyPost);
+//         const generatedArticle = await generateArticleText(filteredApifyPost.postText);
+//         console.log(generatedArticle);
+//     })*/
+//     const staffbasePosts = {};
+//     let articlesString = '';
+//     let successfulGenCounter = 1;
 
-    //for each li post scraped, generate a article text and save data to StaffbasePosts object and append article body to string
-    for (const apifyPost of apifyPosts.items) {
-        let articleGenerationAttempts = 1;
-        const filteredApifyPost = postFilter(apifyPost);
+//     //for each li post scraped, generate a article text and save data to StaffbasePosts object and append article body to string
+//     for (const apifyPost of apifyPosts.items) {
+//         let articleGenerationAttempts = 1;
+//         const filteredApifyPost = postFilter(apifyPost);
 
-        if (!filteredApifyPost) continue;
+//         if (!filteredApifyPost) continue;
 
-        const generatedArticle = await retryAsyncOperation(async () => {
-            return await generateArticleText(filteredApifyPost.postText);
-        });
-        if (!generatedArticle.success || !generatedArticle) continue;
-        staffbasePosts[successfulGenCounter] = {
-            title: generatedArticle.title,
-            body: generatedArticle.body,
-            image: filteredApifyPost.postImage,
-            urlToOriginalPost: filteredApifyPost.originalPostURL
-        }
-        articlesString = articlesString + '\n' + `article ${successfulGenCounter}` + '\n' + generatedArticle.body;
-        successfulGenCounter++;
-        console.log(successfulGenCounter);
-    }
-
-
-    try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-        const context = 'Imagine that I am creating a newspaper with different news sections.';
-        const fullPrompt = `${context}
-Based on the following articles, generate a list of at least 7 news sections that are internal communications focused and place each article in the section you think it belongs to. Make sure two of the channels are named Top News & Local News.
-${articlesString}
-Provide your answer in json in the following format:
-{
-	Section 1: [0, 3, …],
-	Section 2: [5, 7, …],
-	…
-}
-In your outputted JSON, make sure that there are no sections that contain a empty array ([]) and order the sections in accordance to what you will believe will be the most important news sections to read first.
-Make sure to return your outputted JSON as a string and not in markdown.
-        `;
-
-        //ask gemini to create channel names and place article in approiate channels. Return that info in JSON
-        const result = await retryAsyncOperation(async () => {
-            return await model.generateContent(fullPrompt);
-        });
-        let jsonResult = result.response.text();
-        const jsonRegex = /```json\n([\s\S]*?)\n```/;
-        const match = jsonResult.match(jsonRegex);
-        jsonResult = match[1].trim();
-        //Parse JSON String
-        const channelsObject = JSON.parse(jsonResult);
-        console.log(channelsObject);
-
-        const spaces = await getSBSpaces(sbAuthKey);
-        if (!spaces) return;
-
-        let accessorIDs = [];
-        for (const space of spaces) {
-            if (space.name === 'All employees') {
-                accessorIDs = space.accessorIDs;
-                break;
-            }
-        }
-        //get generates channel names from JSON
-        const channelNames = Object.keys(channelsObject);
-        for (const channelName of channelNames) {
-            const channelID = await createSBNewsChannel(sbAuthKey, channelName, accessorIDs);
-            await publishSBNewsChannel(sbAuthKey, channelID);
-            console.log(`Channel ${channelName} has been added and published`);
-            const articlesIDArr = channelsObject[channelName];
-            console.log(articlesIDArr.length);
-
-            if (articlesIDArr.length > 0) {
-                articlesIDArr.forEach(async articleID => {
-                    const article = staffbasePosts[articleID];
-                    if (article.title.length > 0 && article.body.length > 0 && article.image.length > 0) {
-                        const staffbaseCDNPost = await uploadMediaToStaffbase(sbAuthKey, article.image, 'Gen Photo');
-                        const imageObject = staffbaseCDNPost.data.transformations;
-                        await createStaffbaseArticle(sbAuthKey, channelID, article.title, article.body, imageObject);
-                        console.log(`Article ${articleID} has been added to channel ${channelName}`)
-                    }
-
-                })
-            }
-        }
+//         const generatedArticle = await retryAsyncOperation(async () => {
+//             return await generateArticleText(filteredApifyPost.postText);
+//         });
+//         if (!generatedArticle.success || !generatedArticle) continue;
+//         staffbasePosts[successfulGenCounter] = {
+//             title: generatedArticle.title,
+//             body: generatedArticle.body,
+//             image: filteredApifyPost.postImage,
+//             urlToOriginalPost: filteredApifyPost.originalPostURL
+//         }
+//         articlesString = articlesString + '\n' + `article ${successfulGenCounter}` + '\n' + generatedArticle.body;
+//         successfulGenCounter++;
+//         console.log(successfulGenCounter);
+//     }
 
 
-    } catch (error) {
-        console.log(error);
-    }
-}
+//     try {
+//         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+//         const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+//         const context = 'Imagine that I am creating a newspaper with different news sections.';
+//         const fullPrompt = `${context}
+// Based on the following articles, generate a list of at least 7 news sections that are internal communications focused and place each article in the section you think it belongs to. Make sure two of the channels are named Top News & Local News.
+// ${articlesString}
+// Provide your answer in json in the following format:
+// {
+// 	Section 1: [0, 3, …],
+// 	Section 2: [5, 7, …],
+// 	…
+// }
+// In your outputted JSON, make sure that there are no sections that contain a empty array ([]) and order the sections in accordance to what you will believe will be the most important news sections to read first.
+// Make sure to return your outputted JSON as a string and not in markdown.
+//         `;
 
-export const testRoute = async (req, res, next) => {
-    const sbAuthKey = req.headers.authorization.split(' ')[1];
-    const page = await getSBPage(sbAuthKey, '67955b9847eb2a43dbee1b3c');
-    let pageHTML = page.contents.en_US.content;
-    const dom = new JSDOM(pageHTML);
-    const document = dom.window.document;
-    //console.log(document.documentElement.outerHTML);
-    const allDivs = document.querySelectorAll('div[data-widget-type="NewsStage"]');
-    allDivs.forEach(div => {
-        console.log(div.innnerHTML);
-    });
+//         //ask gemini to create channel names and place article in approiate channels. Return that info in JSON
+//         const result = await retryAsyncOperation(async () => {
+//             return await model.generateContent(fullPrompt);
+//         });
+//         let jsonResult = result.response.text();
+//         const jsonRegex = /```json\n([\s\S]*?)\n```/;
+//         const match = jsonResult.match(jsonRegex);
+//         jsonResult = match[1].trim();
+//         //Parse JSON String
+//         const channelsObject = JSON.parse(jsonResult);
+//         console.log(channelsObject);
 
-    /*
-    try {
-        //Authorization Header
-        const headers = {
-            Authorization: `Basic ${sbAuthKey}`,
+//         const spaces = await getSBSpaces(sbAuthKey);
+//         if (!spaces) return;
 
-        }
-        const baseUrl = `https://app.staffbase.com/api/channels/67953c0c2943b96047f9618f/posts`;
-        
-        const body = {
-            contents: {
-                en_US: {
-                    content: "test",
-                    title: "barney",
-                }
-            },
-            hashtags: ["fefe"]
-        };
-        const response = await axios.post(baseUrl, body, { headers });
-        console.log(response);
-        return { success: true };
-    } catch (error) {
-        console.log(error);
-        return { success: false, error, errorMessage: `Error posting article: ${error}` };
-    }*/
-    /*
-    const test = await getSBNewsChannels(sbAuthKey);
-    console.log(test);
-    console.log(test.length);
-    
-    test.forEach(async cid => {
-        await deleteSBNewsChannel(sbAuthKey, cid);
-    });*/
+//         let accessorIDs = [];
+//         for (const space of spaces) {
+//             if (space.name === 'All employees') {
+//                 accessorIDs = space.accessorIDs;
+//                 break;
+//             }
+//         }
+//         //get generates channel names from JSON
+//         const channelNames = Object.keys(channelsObject);
+//         for (const channelName of channelNames) {
+//             const channelID = await createSBNewsChannel(sbAuthKey, channelName, accessorIDs);
+//             await publishSBNewsChannel(sbAuthKey, channelID);
+//             console.log(`Channel ${channelName} has been added and published`);
+//             const articlesIDArr = channelsObject[channelName];
+//             console.log(articlesIDArr.length);
 
-    /*
-    const test2 = await getSBNewsChannelsBranch(sbAuthKey);
-    console.log(test2);
-    
-    test2.forEach(async cid => {
-        await deleteSBNewsChannel(sbAuthKey, cid);
-    }); */
-    //authorID: "67603f92be16fc7fcfc2df24"
-}
+//             if (articlesIDArr.length > 0) {
+//                 articlesIDArr.forEach(async articleID => {
+//                     const article = staffbasePosts[articleID];
+//                     if (article.title.length > 0 && article.body.length > 0 && article.image.length > 0) {
+//                         const staffbaseCDNPost = await uploadMediaToStaffbase(sbAuthKey, article.image, 'Gen Photo');
+//                         const imageObject = staffbaseCDNPost.data.transformations;
+//                         await createStaffbaseArticle(sbAuthKey, channelID, article.title, article.body, imageObject);
+//                         console.log(`Article ${articleID} has been added to channel ${channelName}`)
+//                     }
+
+//                 })
+//             }
+//         }
+
+
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }

@@ -204,7 +204,7 @@ export const generateContentText = async (reference, contentType) => {
             }
             `;
             contentText = await model.generateContent(prompt);
-            
+
 
 
         } else if (contentType === 'updates') {
@@ -219,10 +219,28 @@ export const generateContentText = async (reference, contentType) => {
             contentText = await model.generateContent(prompt);
         }
 
+        const isValidJSON = str => {
+            try {
+                JSON.parse(str);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        };
+
         //convert return JSON into something that can be worked with
-        const jsonRegex = /```json\n([\s\S]*?)\n```/;
-        const match = contentText.response.text().match(jsonRegex);
-        const jsonResult = JSON.parse(match[1].trim());
+        let jsonResult = contentText.response.text();
+        if (jsonResult.indexOf("json") !== -1 && jsonResult.indexOf("```") !== -1) {
+            const jsonRegex = /```json\n([\s\S]*?)\n```/;
+            const match = jsonResult.match(jsonRegex);
+            jsonResult = match[1].trim();
+            jsonResult = JSON.parse(jsonResult);
+        }else if(isValidJSON(jsonResult)){
+            jsonResult = JSON.parse(jsonResult);
+        }else{
+            return { success: false, error }
+        }
+
         return { success: true, contentText: jsonResult }
     } catch (error) {
         return { success: false, error }

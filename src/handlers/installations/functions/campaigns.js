@@ -469,7 +469,9 @@ export const campaignsInstallation = async (sbAuthKey) => {
                 const match = jsonResult.match(jsonRegex);
                 jsonResult = match[1].trim();
                 jsonResult = JSON.parse(jsonResult);
-            } else if (!isValidJSON(jsonResult)) {
+            } else if (isValidJSON(jsonResult)) {
+                jsonResult = JSON.parse(jsonResult);
+            } else {
                 responseBody['errors'][`Gemini JSON Return Error`] = 'Gemini did not return what we needed to generate campaigns. Please run this script again. If issue persist, please reach out to manager of the script.'
                 return responseBody;
             }
