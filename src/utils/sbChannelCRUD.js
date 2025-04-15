@@ -227,3 +227,62 @@ export const getSBUsers = async (authKey) => {
     }
 
 }
+/**
+* Asynchronously retrieves the menu structure for a specific space within the Staffbase platform.
+*
+* @async
+* @function getMenu
+* @param {string} sbAuthKey - The Staffbase API authentication key (base64 encoded).
+* @param {string} accessorIds - The ID of the space (e.g., a plant or location) for which to retrieve the menu.
+* @returns {Promise<{success: boolean, data: object|Error}>} - A promise that resolves to an object.
+* The object contains a `success` boolean indicating if the request was successful,
+* and a `data` property which holds either the menu data (if successful) or the error object (if failed).
+*/
+const getMenu = async (sbAuthKey, accessorIds) => {
+    const url = `https://app.staffbase.com/api/spaces/${accessorIds}/menu`;
+
+    const headers = {
+        'Authorization': `Basic ${sbAuthKey}`,
+        'Content-Type': 'application/json;charset=utf-8'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        return { success: false, data: error }
+    }
+
+}
+export const getAllNewPages = async (authKey, accessorIds, lookingFor) => {
+    const returnObject = {}
+    // Fetch the current menu structure for the specified Staffbase space.
+    const menu = await getMenu(authKey, accessorIds);
+    if (!menu.success) {
+        return 'Issue fetching menu. Please try again. If problem persist, please reach out to manager of Script';
+    }
+    // Access the top-level menu items from the fetched menu data.
+    let menuItems = menu.data.children;
+
+    //if there are actual menu items
+    if (menuItems["total"] > 0) {
+        //Search top level menu for any news pages that match lookingFor
+        menuItems.data.forEach(item => {
+            //check to see if menu item is a newpage
+            if(item.hasOwnProperty("restrictedPluginID") && item["restrictedPluginID"] === 'news'){
+                //iterate through configuration localization language titles to see if any of the titles match lookingFor
+                //In other words each news page might have several different language titles. Sometimes someone creates a news page with a english title under spanish, so it is best to check everything.
+                const localizationKeys = Object.keys(item.config.localization);
+                console.log(localizationKeys)
+                localizationKeys.forEach(languageKey => {
+                    const currentItemLocalization = item.config.localization[languageKey];
+                    if(lookingFor.includes(currentItemLocalization.title))
+                        returnObject[currentItemLocalization.title] = item.id;
+                });
+            }
+        })
+       
+    }
+
+    console.log(returnObject);
+}

@@ -2,7 +2,7 @@ import { getLinkedinCookies, generateArticleText, createStaffbaseArticle, scrape
 import axios, { spread } from 'axios';
 import puppeteer from 'puppeteer';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createSBNewsChannel, deleteSBNewsChannel, getSBNewsChannel, getSBNewsChannels, getSBNewsChannelsBranch, getSBPage, getSBSpaces, getSBUsers, publishSBNewsChannel, unpublishSBNewsChannel } from "../../utils/sbChannelCRUD.js";
+import { createSBNewsChannel, deleteSBNewsChannel, getAllNewPages, getSBNewsChannel, getSBNewsChannels, getSBNewsChannelsBranch, getSBPage, getSBSpaces, getSBUsers, publishSBNewsChannel, unpublishSBNewsChannel } from "../../utils/sbChannelCRUD.js";
 import { JSDOM } from 'jsdom';
 import pLimit from 'p-limit';
 
@@ -286,6 +286,7 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
                             const createArticle = await createStaffbaseArticle(sbAuthKey, channelID, article.title, article.body, imageObject);
                             if(!createArticle.success){
                                 errors.push(`Error adding article to for channel ${channelName}. Will skip to the next article.`);
+                                return;
                             }
                             responseBody["Channels Created + Count"][channelName] = responseBody["Channels Created + Count"][channelName] + 1;
                             if (errors.length > 0)
@@ -359,6 +360,7 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
             if(channelAdminData.hasOwnProperty('users') && channelAdminData.users.total > 0){
                 //if yes, loop through users and see if any of the ids match jeni's and delete it
                 const deleteChannelPromises =channelAdminData.users.data.map(async channelAdminUser => {
+                    //check for match and delete
                     if(channelAdminUser.id===jeniStaffbaseUserID){
                         const deleteChannel = await deleteSBNewsChannel(sbAuthKey, branchChannelId);
                         if(!deleteChannel){
@@ -369,11 +371,10 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
                 });
                 await Promise.all(deleteChannelPromises);
             }
-         
-
-        })
+        });
 
         //3. Look for the 4 desired news pages (do we create them if they do not exist?)
+        const newsPagesDictionary = await getAllNewPages(sbAuthKey, accessorIDs, ["Testing"]);
         //4. Create 4 channels template channels, map each one to the correct news page, and assign Jeni as a editor for each
         //5. Loop through scrapped post and save data
         //6. Have Gemini map what article belongs to what article
