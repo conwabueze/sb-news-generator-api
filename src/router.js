@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import { handleInputErrors } from './utils/middleware.js';
-import { bulkScrapeLinkedinToStaffbaseArticle} from './handlers/linkedin.js';
+import { bulkScrapeLinkedinToStaffbaseArticle} from './handlers/linkedin/linkedin.js';
 import { generateComments } from './handlers/comments.js';
 import { installations } from './handlers/installations/installations.js';
 

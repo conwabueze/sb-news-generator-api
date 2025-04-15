@@ -1,8 +1,8 @@
-import { getLinkedinCookies, generateArticleText, createStaffbaseArticle, scrapeLinkedinPostsRawData, generateUpdateText, getChannelType, uploadMediaToStaffbase, generateContentText } from "../utils/reusableFunctions.js";
+import { getLinkedinCookies, generateArticleText, createStaffbaseArticle, scrapeLinkedinPostsRawData, generateUpdateText, getChannelType, uploadMediaToStaffbase, generateContentText } from "../../utils/reusableFunctions.js";
 import axios, { spread } from 'axios';
 import puppeteer from 'puppeteer';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createSBNewsChannel, deleteSBNewsChannel, getSBNewsChannels, getSBNewsChannelsBranch, getSBPage, getSBSpaces, publishSBNewsChannel, unpublishSBNewsChannel } from "../utils/sbChannelCRUD.js";
+import { createSBNewsChannel, deleteSBNewsChannel, getSBNewsChannel, getSBNewsChannels, getSBNewsChannelsBranch, getSBPage, getSBSpaces, getSBUsers, publishSBNewsChannel, unpublishSBNewsChannel } from "../../utils/sbChannelCRUD.js";
 import { JSDOM } from 'jsdom';
 import pLimit from 'p-limit';
 
@@ -88,7 +88,7 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
 
     //valid that that whatever provided in channelID is something that we can work with
     //if channelID is none we will valid if they have provided the correct authKey before proceeding. We do this by seeing if we are able to pull spaces from that env and pull the accessorID for the all employee space.
-    if (channelID === 'none') {
+    if (channelID === 'none' || channelID === 'cusstard') {
         const spaces = await getSBSpaces(sbAuthKey);
         if (!spaces.success) {
             switch (spaces.error.status) {
@@ -298,7 +298,6 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
                     await Promise.all(articlePromises);
                 }
             });
-            console.log("done")
             await Promise.all(postPromises);
             res.status(200).json({ data: responseBody });
             
@@ -306,7 +305,81 @@ export const bulkScrapeLinkedinToStaffbaseArticle = async (req, res, next) => {
             console.log(error)
         }
 
-    } else {
+    }else if(channelID === "cusstard"){
+        const responseBody = {
+
+        }
+        res.status(200).json({message: 'im here'});
+
+        //1. Look for user 'Jeni Staffbase'. This user will be responsible for varifying which channel was generated
+        
+        //Get all staffbase users in branch
+        const sbUsers = await getSBUsers(sbAuthKey);
+        //if unsucessful, return a error
+        if(!sbUsers.success){
+            res.status(400).json({ error: "ERROR_PULLING_SB_USER_DATA", message: "There was a unexpected issue pulling SB user data. Please try again. If issue persist, please reach out to the manager of this script." })
+            return;
+        }
+
+        //initial variable to hold user ID for user Jeni Staffbase
+        let jeniStaffbaseUserID = null;
+
+        //loop through user objects to find user id of Jeni Staffbase and save it
+        sbUsers.data.forEach(user => {
+            if(user.firstName === 'Jeni' && user.lastName === 'Staffbase'){
+                jeniStaffbaseUserID = user.id;
+            }
+        })
+
+        //2. Look for any channels in which Jeni is a Editor and delete them
+        
+        //get list of all channels in branch
+        const allChannelsInBranch = await getSBNewsChannelsBranch(sbAuthKey);
+        if(!allChannelsInBranch.success){
+            res.status(400).json({ error: "ERROR_PULLING_SB_BRANCH_CHANNELS", message: "There was a unexpected issue pulling SB branch channel data for old branded channel deletion. Please try again. If issue persist, please reach out to the manager of this script." })
+            return;
+        }
+
+        //loop through channels object for channel ids
+        allChannelsInBranch.data.forEach(async branchChannel => {
+            //save id of channel
+            const branchChannelId = branchChannel.id;
+
+            //get data object on the individual channel to check out who are the admins. If it's Jeni, delete the channel
+            const channel = await getSBNewsChannel(sbAuthKey, branchChannelId); //get channel object
+            //if unsuccessful, return error
+            if(!channel.success){
+                res.status(400).json({ error: "ERROR_PULLING_SB_CHANNEL_DATA", message: "There was a unexpected issue pulling a channel's data to check for deletion. Please try again. If issue persist, please reach out to the manager of this script." })
+                return;
+            }
+
+            //get admin data for channel to potentially look for jeni as admin
+            const channelAdminData = channel.data.admins;
+            //check to see if channel has any user admins
+            if(channelAdminData.hasOwnProperty('users') && channelAdminData.users.total > 0){
+                //if yes, loop through users and see if any of the ids match jeni's and delete it
+                const deleteChannelPromises =channelAdminData.users.data.map(async channelAdminUser => {
+                    if(channelAdminUser.id===jeniStaffbaseUserID){
+                        const deleteChannel = await deleteSBNewsChannel(sbAuthKey, branchChannelId);
+                        if(!deleteChannel){
+                            console.log(`error deleting channel ${branchChannelId}`)
+                        }
+                        console.log(`deleted channel ${branchChannelId}`)
+                    }
+                });
+                await Promise.all(deleteChannelPromises);
+            }
+         
+
+        })
+
+        //3. Look for the 4 desired news pages (do we create them if they do not exist?)
+        //4. Create 4 channels template channels, map each one to the correct news page, and assign Jeni as a editor for each
+        //5. Loop through scrapped post and save data
+        //6. Have Gemini map what article belongs to what article
+        //7. Return response
+    } 
+    else {
         const channelType = await getChannelType(sbAuthKey, channelID);
         //Once we have are post, loop through each post to pull needed data, run the text through Gemini, and post to Staffbase
 
