@@ -2,6 +2,7 @@ import { Firestore } from '@google-cloud/firestore';
 import { ApifyClient } from 'apify-client';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from 'axios';
+import sharp from 'sharp'; // Or import sizeOf from 'image-size';
 
 
 /**
@@ -235,9 +236,9 @@ export const generateContentText = async (reference, contentType) => {
             const match = jsonResult.match(jsonRegex);
             jsonResult = match[1].trim();
             jsonResult = JSON.parse(jsonResult);
-        }else if(isValidJSON(jsonResult)){
+        } else if (isValidJSON(jsonResult)) {
             jsonResult = JSON.parse(jsonResult);
-        }else{
+        } else {
             return { success: false, error }
         }
 
@@ -326,26 +327,80 @@ export const createStaffbaseChannel = async (apiToken, channelName) => {
     const baseUrl = `https://app.staffbase.com/api/media`;
 
 }
-export const uploadMediaToStaffbase = async (apiToken, imageUrl, fileName) => {
+// export const uploadMediaToStaffbase = async (apiToken, imageUrl, fileName) => {
+//     const baseUrl = `https://app.staffbase.com/api/media`;
+//     const imageFetch = await fetch(imageUrl);
+//     const blob = await imageFetch.blob();
+//     const file = new File([blob], 'Test File', { type: blob.type });
+//     const formData = new FormData();
+//     formData.append('file', file, fileName);
+
+//     try {
+//         const response = await axios.post(baseUrl, formData, {
+//             headers: {
+//                 'Authorization': `Basic ${apiToken}`,
+//                 'Content-Type': `multipart/form-data;`,
+//             },
+//         })
+//         //console.log(response.data.transformations.t_preview.resourceInfo);
+//         const previewImageData = response.data.transformations.t_preview.resourceInfo;
+//         return { success: true, data: { url: response.data.resourceInfo.url, previewUrl: previewImageData.url, width: previewImageData.width, height: previewImageData.height, transformations: previewImageData } }
+//     } catch (error) {
+//         return { success: false, error, errorMessage: `Error uploading image to Staffbase: ${error}` };
+//     }
+// }
+
+
+
+
+export const uploadMediaToStaffbase = async (apiToken, imageUrl, fileName, minWidth = 400, minHeight = 100) => {
     const baseUrl = `https://app.staffbase.com/api/media`;
-    const imageFetch = await fetch(imageUrl);
-    const blob = await imageFetch.blob();
-    const file = new File([blob], 'Test File', { type: blob.type });
-    const formData = new FormData();
-    formData.append('file', file, fileName);
 
     try {
-        const response = await axios.post(baseUrl, formData, {
+        const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+        const imageFetch = await fetch(imageUrl);
+        const blob = await imageFetch.blob();
+        const file = new File([blob], 'Test File', { type: blob.type });
+        const formData = new FormData();
+        formData.append('file', file, fileName);
+
+        const imageBuffer = Buffer.from(response.data);
+
+        let imageMetadata;
+        try {
+            imageMetadata = await sharp(imageBuffer).metadata(); // Using sharp
+            // Or:
+            // imageMetadata = sizeOf(imageBuffer); // Using image-size
+        } catch (error) {
+            console.log('Failed to read image metadata.');
+            return { success: false, error: `Failed to read image metadata.`, errorMessage: error.message };
+        }
+
+        if (imageMetadata.width < minWidth /*|| imageMetadata.height < minHeight*/) {
+            console.log('Image resolution is too low');
+            console.log(imageMetadata.width);
+            return { success: false, error: `Image resolution is too low. Minimum dimensions required: ${minWidth}x${minHeight}px. Current dimensions: ${imageMetadata.width}x${imageMetadata.height}px` };
+        }
+
+        const uploadResponse = await axios.post(baseUrl, formData, {
             headers: {
                 'Authorization': `Basic ${apiToken}`,
-                'Content-Type': `multipart/form-data;`,
+                'Content-Type': `multipart/form-data;`
             },
-        })
-        //console.log(response.data.transformations.t_preview.resourceInfo);
-        const previewImageData = response.data.transformations.t_preview.resourceInfo;
-        return { success: true, data: { url: response.data.resourceInfo.url, previewUrl: previewImageData.url, width: previewImageData.width, height: previewImageData.height, transformations: previewImageData } }
-    } catch (error) {
-        return { success: false, error, errorMessage: `Error uploading image to Staffbase: ${error}` };
-    }
-}
+        });
 
+        const previewImageData = uploadResponse.data.transformations.t_preview.resourceInfo;
+        return {
+            success: true,
+            data: {
+                url: uploadResponse.data.resourceInfo.url,
+                previewUrl: previewImageData.url,
+                width: imageMetadata.width,
+                height: imageMetadata.height,
+                transformations: previewImageData,
+            },
+        };
+    } catch (error) {
+        return { success: false, error, errorMessage: `Error uploading image to Staffbase: ${error?.message || error}` };
+    }
+};
