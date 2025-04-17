@@ -20,9 +20,64 @@ export const getSBNewsChannel = async (authKey, channelID) => {
 
 }
 
-export const createSBNewsChannel = async (authKey, channelName, accessorIDs = []) => {
+export const createSBNewsChannel = async (authKey, channelName, accessorIDs = [], adminIDs = '', contentType = 'articles') => {
 
     const url = 'https://app.staffbase.com/api/installations';
+
+    const data = {
+        "pluginID": "news",
+        "config": {
+            "localization": {
+                "en_US": {
+                    "title": `${channelName}`, "description": null
+                }
+            },
+            showAdminActions: true,
+            showPageBackground: true,
+            sidebarVisible: true
+        },
+        "commentingAllowed": true,
+        "commentingEnabledDefault": true,
+        "likingAllowed": true,
+        "likingEnabledDefault": true,
+        "acknowledgingAllowed": true,
+        "acknowledgingEnabledDefault": false,
+        "highlightingAllowed": true,
+        "highlightingEnabledDefault": false,
+        "internalSharingAllowed": false,
+        "externalSharingAllowed": false,
+        "internalSharingEnabledDefault": false,
+        "externalSharingEnabledDefault": false,
+        "notificationChannelsAllowed": ["email", "push"],
+        "notificationChannelsDefault": ["email", "push"],
+        "contentType": contentType,
+        "visibleInPublicArea": false,
+        "accessorIDs": accessorIDs //you need this to have for all users visibility
+    };
+
+    if (adminIDs !== '')
+        data["adminIDs"] = adminIDs
+
+    const headers = {
+        'Authorization': `Basic ${authKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.post(url, data, { headers });
+        return { success: true, data: response.data.id };
+    } catch (error) {
+        console.error('Error:', error);
+        return { success: false, data: error };
+
+    }
+
+
+}
+
+export const updateSBNewsChannel = async (authKey, channelName, channelID, accessorIDs = [], menuFolderIDs = '') => {
+
+    const url = `https://app.staffbase.com/api/installations/${channelID}`;
 
     const data = {
         "pluginID": "news",
@@ -55,6 +110,9 @@ export const createSBNewsChannel = async (authKey, channelName, accessorIDs = []
         "accessorIDs": accessorIDs //you need this to have for all users visibility
     };
 
+    if (menuFolderIDs !== '')
+        data["menuFolderIDs"] = menuFolderIDs;
+
     const headers = {
         'Authorization': `Basic ${authKey}`,
         'Content-Type': 'application/json'
@@ -64,13 +122,90 @@ export const createSBNewsChannel = async (authKey, channelName, accessorIDs = []
         const response = await axios.post(url, data, { headers });
         return { success: true, data: response.data.id };
     } catch (error) {
-        console.error('Error:', error);
+        //console.error('Error:', error);
         return { success: false, data: error };
 
     }
 
 
 }
+
+export const addNewsPageToSBNewsChannel = async (sbAuthKey, accessorIds, newspageId ,channelId) => {
+    const url = `https://app.staffbase.com/api/spaces/${accessorIds}/menu`;
+
+    const headers = {
+        'Authorization': `Basic ${sbAuthKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    const data = [
+        {
+            "op": "add",
+            "path": `/${newspageId}/0`,
+            "value": {
+                "installationID": channelId,
+                "nodeType": "installation",
+                "pluginID": "news"
+            }
+        }
+    ]
+
+    try {
+        const response = await axios.patch(url, data, { headers });
+        return { success: true, data: response.data };
+    } catch (error) {
+        //console.error('Error:', error);
+        return { success: false, data: error };
+
+    }
+}
+
+export const addNewsPageToSBNewsChannelWithRetry = async (
+    sbAuthKey,
+    accessorIds,
+    newspageId,
+    channelId,
+    maxRetries = 5, // Set a maximum number of retries
+    retryDelayMs = 2000 // Set a delay between retries in milliseconds
+  ) => {
+    let retries = 0;
+    let result = { success: false };
+  
+    while (!result.success && retries < maxRetries) {
+      try {
+        const url = `https://app.staffbase.com/api/spaces/${accessorIds}/menu`;
+        const headers = {
+          'Authorization': `Basic ${sbAuthKey}`,
+          'Content-Type': 'application/json',
+        };
+        const data = [
+          {
+            op: 'add',
+            path: `/${newspageId}/0`,
+            value: {
+              installationID: channelId,
+              nodeType: 'installation',
+              pluginID: 'news',
+            },
+          },
+        ];
+  
+        const response = await axios.patch(url, data, { headers });
+        result = { success: true, data: response.data };
+        return result; // If successful, exit the loop and return
+      } catch (error) {
+        console.error(`Attempt ${retries + 1} failed:`, error);
+        result = { success: false, data: error };
+        retries++;
+        if (retries < maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        }
+      }
+    }
+  
+    console.error(`Failed after ${maxRetries} attempts.`);
+    return result; // Return the final (failed) result if max retries are reached
+  };
 
 export const deleteSBNewsChannel = async (authKey, channelID) => {
 
@@ -254,12 +389,67 @@ const getMenu = async (sbAuthKey, accessorIds) => {
     }
 
 }
-export const getAllNewPages = async (authKey, accessorIds, lookingFor) => {
+
+const getNestedMenu = async (sbAuthKey, accessorIds, nestedMenuId) => {
+    const url = `https://app.staffbase.com/api/spaces/${accessorIds}/menu/${nestedMenuId}`;
+
+    const headers = {
+        'Authorization': `Basic ${sbAuthKey}`,
+        'Content-Type': 'application/json;charset=utf-8'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        return { success: false, data: error }
+    }
+
+}
+
+const getNestedMenuNewsPages = async (sbAuthKey, accessorIds, nestedMenuId, lookingFor, returnObject) => {
+    const menu = await getNestedMenu(sbAuthKey, accessorIds, nestedMenuId); //nested menu
+    if (!menu.success) {
+        return { success: false, error: 'Issue fetching menu. Please try again. If problem persist, please reach out to manager of Script' }
+    }
+
+    // Access the top-level menu items from the fetched menu data.
+    let menuItems = menu.data.children;
+
+    //if there are actual menu items
+    if (menuItems["total"] > 0) {
+        //Search top level menu for any news pages that match lookingFor
+        const menuItemsLookThrough = menuItems.data.map(async item => {
+            //check to see if menu item is a newpage
+            if (item.hasOwnProperty("restrictedPluginID") && item["restrictedPluginID"] === 'news') {
+                //iterate through configuration localization language titles to see if any of the titles match lookingFor
+                //In other words each news page might have several different language titles. Sometimes someone creates a news page with a english title under spanish, so it is best to check everything.
+                const localizationKeys = Object.keys(item.config.localization);
+                localizationKeys.forEach(languageKey => {
+                    const currentItemLocalization = item.config.localization[languageKey];
+                    if (lookingFor.some(menuItemToLookFor => menuItemToLookFor === currentItemLocalization.title)) {
+                        returnObject[currentItemLocalization.title] = item.id;
+                    }
+                });
+            }
+
+            //if we are not dealing with a news page, check if we are dealing with a folder.
+            //if it is a folder, we should check the folder items for any news pages and save that into the reponse body
+            if (item.hasOwnProperty("children") && item["children"]["total"] > 0) {
+                const nestedMenuNewsPages = await getNestedMenuNewsPages(sbAuthKey, accessorIds, item.id, lookingFor, returnObject);
+            }
+        });
+        await Promise.all(menuItemsLookThrough);
+    }
+
+}
+
+export const getAllNewPages = async (sbAuthKey, accessorIds, lookingFor) => {
     const returnObject = {}
     // Fetch the current menu structure for the specified Staffbase space.
-    const menu = await getMenu(authKey, accessorIds);
+    const menu = await getMenu(sbAuthKey, accessorIds);
     if (!menu.success) {
-        return 'Issue fetching menu. Please try again. If problem persist, please reach out to manager of Script';
+        return { success: false, error: 'Issue fetching menu. Please try again. If problem persist, please reach out to manager of Script' }
     }
     // Access the top-level menu items from the fetched menu data.
     let menuItems = menu.data.children;
@@ -267,22 +457,28 @@ export const getAllNewPages = async (authKey, accessorIds, lookingFor) => {
     //if there are actual menu items
     if (menuItems["total"] > 0) {
         //Search top level menu for any news pages that match lookingFor
-        menuItems.data.forEach(item => {
+        const menuItemsLookThrough = menuItems.data.map(async item => {
             //check to see if menu item is a newpage
-            if(item.hasOwnProperty("restrictedPluginID") && item["restrictedPluginID"] === 'news'){
+            if (item.hasOwnProperty("restrictedPluginID") && item["restrictedPluginID"] === 'news') {
                 //iterate through configuration localization language titles to see if any of the titles match lookingFor
                 //In other words each news page might have several different language titles. Sometimes someone creates a news page with a english title under spanish, so it is best to check everything.
                 const localizationKeys = Object.keys(item.config.localization);
-                console.log(localizationKeys)
                 localizationKeys.forEach(languageKey => {
                     const currentItemLocalization = item.config.localization[languageKey];
-                    if(lookingFor.includes(currentItemLocalization.title))
+                    if (lookingFor.some(menuItemToLookFor => menuItemToLookFor === currentItemLocalization.title)) {
                         returnObject[currentItemLocalization.title] = item.id;
+                    }
                 });
             }
-        })
-       
+
+            //if we are not dealing with a news page, check if we are dealing with a folder.
+            //if it is a folder, we should check the folder items for any news pages and save that into the reponse body
+            if (item.hasOwnProperty("children") && item["children"]["total"] > 0) {
+                const nestedMenuNewsPages = await getNestedMenuNewsPages(sbAuthKey, accessorIds, item.id, lookingFor, returnObject);
+            }
+        });
+        await Promise.all(menuItemsLookThrough);
     }
 
-    console.log(returnObject);
+    return { success: true, data: returnObject };
 }

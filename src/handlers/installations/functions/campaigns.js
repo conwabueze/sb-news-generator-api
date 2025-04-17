@@ -138,7 +138,7 @@ const assignCampaignToPost = async (sbAuthKey, postId, campaignId) => {
  * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
  */
 const getBranchChannels = async (sbAuthKey) => {
-    const url = 'https://app.staffbase.com/api/branch/channels';
+    const url = 'https://app.staffbase.com/api/branch/channels?limit=100';
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -173,7 +173,7 @@ const getBranchChannels = async (sbAuthKey) => {
  * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
  */
 const getChannelPosts = async (sbAuthKey, channelID) => {
-    const url = `https://app.staffbase.com/api/channels/${channelID}/posts?limit=50`;
+    const url = `https://app.staffbase.com/api/channels/${channelID}/posts?limit=100`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -419,7 +419,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
                     continue;
                 }
                 //if posts exists, loop through it
-                if (channelPosts.data.data.length > 0) {
+                if (channelPosts.data.hasOwnProperty("data") && channelPosts.data.data.length > 0) {
                     //the number of posts we loop through depends on the number of posts in that channel.
                     //if the channel has more that 10 posts, only count through half of the channels total posts.
                     const channelLoopCount = channelPosts.data.data.length;
