@@ -1,0 +1,887 @@
+{
+    "title": "Welcome to your Intranet",
+    "content": {
+        "blocks": [
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 3,
+                    "columns": [
+                        {
+                            "columnIdx": "ad4f9c46867b93ea5100407aced1bab5",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "containerBackgroundColor": "#ffffff",
+                                        "height": 10
+                                    },
+                                    "elmIdx": "a92b7d64e5acdb688119f128f075ea5126c1",
+                                    "type": "SPACER"
+                                }
+                            ],
+                            "size": 0.41
+                        },
+                        {
+                            "columnIdx": "20b57cab32b4e975e74f07e4a8e7196e",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 1,
+                                        "href": "",
+                                        "mediumId": "67640ef8deb69540da0288a9",
+                                        "mimetype": "",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 30,
+                                        "paddingRight": 30,
+                                        "paddingTop": 10,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/c_limit,w_1160/67640ef8deb69540da0288a9.png"
+                                    },
+                                    "elmIdx": "075ecec4d40ee6e5bac8b5b6e7731a32b4ec",
+                                    "type": "IMAGE"
+                                }
+                            ],
+                            "size": 0.18
+                        },
+                        {
+                            "columnIdx": "f15b50d5eda077bd1b3eacc467715dc8",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "containerBackgroundColor": "#ffffff",
+                                        "height": 10
+                                    },
+                                    "elmIdx": "7f3d9ea74aba4eb1127cb9b05a7ce77a9ca5",
+                                    "type": "SPACER"
+                                }
+                            ],
+                            "size": 0.41
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "19ff4ff8e84f7ba02dff0cad",
+                "title": "pVCZ9awQypCb",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "53a05b6e8404ecf09d362430823f09b0",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 5,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 5,
+                                        "textMarkupValue": "<h2 style=\"font-family:Arial;font-size:24px;font-weight:bold;line-height:38px;text-align:center;\" ck-header=\"defaultCK\"><span style=\"color:#1c1c1c;font-size:25px;\"><span lang=\"en\" dir=\"ltr\">Welcome to the team&nbsp;</span></span><span style=\"color:#1f5796;font-size:25px;font-weight:bold;\"><span class=\"personalization\">{{firstName}}</span>!</span></h2>"
+                                    },
+                                    "elmIdx": "0a7a7fbbd4f744a62d98f6f5c52e0b618ab7",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;line-height:19px;margin-bottom:0px;margin-top:0px;text-align:left;\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">We’re so excited to have you on board at </span></span><span style=\"font-size:14px;font-weight:bold;\">Connect</span><span style=\"font-size:14px;\">! As you settle in, here are a few steps and tips to help you hit the ground running.</span></p>"
+                                    },
+                                    "elmIdx": "755eb8a44b10a409076a6ab3390ec6c15c14",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 1.4971751,
+                                        "href": "",
+                                        "mediumId": "678a7ff5efe7990e5527875c",
+                                        "mimetype": "",
+                                        "paddingBottom": 0,
+                                        "paddingLeft": 0,
+                                        "paddingRight": 0,
+                                        "paddingTop": 0,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/678a7ff5efe7990e5527875c.png"
+                                    },
+                                    "elmIdx": "231e2afeb9c6c2d5b1c769b4cc53251065d9",
+                                    "type": "IMAGE"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 10,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "0772cf31733309a71ebf9dc4",
+                "title": "BZSRVzI6a0WS",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "70552518e6765521f7399926ec937223",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "containerBackgroundColor": "#f2f2f2",
+                                        "height": 10
+                                    },
+                                    "elmIdx": "567d7083aba92c2a8e5b966a4961eba9a916",
+                                    "type": "SPACER"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 0,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "fe01bfd4d25bd7209af7bec1",
+                "title": "Spacer",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "63ebcdecca3daef252956aa3ef0a2f5d",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:24px;font-weight:bold;line-height:36px;text-align:center;\"><span style=\"color:#1f5796;font-weight:bold;\">Your First Week at a Glance</span></p>"
+                                    },
+                                    "elmIdx": "057f6ed64f8a196adc534d04be82e64544b7",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "a0821d6068f422f92b697475",
+                "title": "BZSRVzI6a0WS",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 3,
+                    "columns": [
+                        {
+                            "columnIdx": "fe8bc6339e3a626ddcd669e4d73b7651",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 1.6125654,
+                                        "href": "",
+                                        "mediumId": "678a849124dbb03d922cf72c",
+                                        "mimetype": "",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/c_limit,w_1160/678a849124dbb03d922cf72c.png"
+                                    },
+                                    "elmIdx": "1dcc6935303b851a8ed8862837e5bec606ae",
+                                    "type": "IMAGE"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;font-weight:normal;line-height:24px;text-align:left;\" ck-header=\"defaultCK\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:16px;font-weight:bold;\"><span lang=\"en\" dir=\"ltr\">Access to Workday</span></span></p>"
+                                    },
+                                    "elmIdx": "cceb490d3441209d690a93700f42418df006",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 5,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 5,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;line-height:19px;margin-bottom:0px;margin-top:0px;text-align:left;\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">Log in to Workday to review your benefits, update your profile, and complete any pending tasks.</span></span></p>"
+                                    },
+                                    "elmIdx": "caf7459cd62267cf527f6f89af2b35295b96",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 0.29
+                        },
+                        {
+                            "columnIdx": "c02a35154b69ae55b8114cd0a6636406",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 1.6028119,
+                                        "href": "",
+                                        "mediumId": "678a83dc58f02956e5e7002b",
+                                        "mimetype": "",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/c_limit,w_1160/678a83dc58f02956e5e7002b.png"
+                                    },
+                                    "elmIdx": "3e53a088b2653d204077269d4af64628cd42",
+                                    "type": "IMAGE"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;font-weight:normal;line-height:24px;text-align:left;\" ck-header=\"defaultCK\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:16px;font-weight:bold;\"><span lang=\"en\" dir=\"ltr\">Explore Trello</span></span></p>"
+                                    },
+                                    "elmIdx": "4b38e94e7d49d941344d1fdb5ce2f98fa109",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 5,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 5,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;line-height:19px;margin-bottom:0px;margin-top:0px;text-align:left;\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">Get familiar with our project management tool and see how your team stays organized.</span></span></p>"
+                                    },
+                                    "elmIdx": "36b0d54b407e3a74d26be1e5b473740afb42",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 0.46
+                        },
+                        {
+                            "columnIdx": "b03b471bf2e72d7b4518013c9bc250eb",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 1.9807428,
+                                        "href": "",
+                                        "mediumId": "678a81a0fc96a5258a5ffe68",
+                                        "mimetype": "",
+                                        "paddingBottom": 26,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/c_limit,w_1160/678a81a0fc96a5258a5ffe68.png"
+                                    },
+                                    "elmIdx": "e3cdfa8cddaf867c6a17da4483f1c28aff36",
+                                    "type": "IMAGE"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;font-weight:normal;line-height:24px;text-align:left;\" ck-header=\"defaultCK\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:16px;font-weight:bold;\"><span lang=\"en\" dir=\"ltr\">Connect with your Manager</span></span></p>"
+                                    },
+                                    "elmIdx": "6064aa6ca75ea3381955a9a5f2a03c310e93",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 5,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 5,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;line-height:19px;margin-bottom:0px;margin-top:0px;text-align:left;\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">Schedule your 1:1 meetings with Stephanie to discuss your goals, expectations, and how we can support you.</span></span></p>"
+                                    },
+                                    "elmIdx": "c5f885772a29669d8616f105f22f519258fc",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 0.25
+                        }
+                    ],
+                    "paddingBottom": 10,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "86ab7b7785d55b32cd0275d6",
+                "title": "3dsFld29xEZ/",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "41b74d3dd850ccda2714b4ff500b37e3",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "containerBackgroundColor": "#f2f2f2",
+                                        "height": 10
+                                    },
+                                    "elmIdx": "3745b3580c3d8a8c53480f223c5d317d159b",
+                                    "type": "SPACER"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "5463d0cbe6b7ec5d97628323",
+                "title": "Spacer",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "0ad07fa0e157ffb808c02e48e719bc93",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<h2 style=\"font-family:Arial;font-size:24px;font-weight:bold;line-height:36px;text-align:center;\" ck-header=\"defaultCK\"><span style=\"color:#1f5796;\"><span lang=\"en\" dir=\"ltr\">Our Connect App</span></span></h2>"
+                                    },
+                                    "elmIdx": "a679a2c97accd4638cd79676238583cda6f5",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "3b6de01cccd30051f45ad473",
+                "title": "BZSRVzI6a0WS",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 2,
+                    "columns": [
+                        {
+                            "columnIdx": "4563c82c645be90377410028bedad506",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 1.5515151,
+                                        "href": "",
+                                        "mediumId": "678a88c2d870f50d6f72cda6",
+                                        "mimetype": "",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/678a88c2d870f50d6f72cda6.png"
+                                    },
+                                    "elmIdx": "e3e03f64a1a0b726d304e77c89547d37dade",
+                                    "type": "IMAGE"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "backgroundColor": "#01579B",
+                                        "borderRadius": 3,
+                                        "color": "#FFF",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "14px",
+                                        "fontStyle": "normal",
+                                        "fontWeight": "bold",
+                                        "href": "https://connect.staffbase.com/content/page/5f47682d7571b314481814bd",
+                                        "innerHorizontalPadding": 10,
+                                        "innerVerticalPadding": 10,
+                                        "lineHeight": "16.8px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "text": "Explore the Connect App",
+                                        "textDecoration": "none"
+                                    },
+                                    "elmIdx": "3953a3eb85b991a745ae504b362121645f40",
+                                    "type": "BUTTON"
+                                }
+                            ],
+                            "size": 0.48
+                        },
+                        {
+                            "columnIdx": "4d3684ce5c73bd990ff8131dbf91da5d",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 5,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 5,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;line-height:19px;margin-bottom:0px;margin-top:0px;text-align:left;\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">Our </span></span><span style=\"font-size:14px;font-weight:bold;\"><span lang=\"en\" dir=\"ltr\">Connect App</span></span><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\"> is your one-stop destination to stay informed and engaged. You’ll find everything about Connect’s vision, mission, values, updates from our CEO Richard Fayer, upcoming company events, and resources from teams like HR and Finance.&nbsp;</span></span></p><p style=\"font-family:Arial;font-size:16px;line-height:19px;margin-bottom:0px;margin-top:0px;text-align:left;\" lang=\"en\" dir=\"ltr\">&nbsp;</p><p style=\"font-family:Arial;font-size:16px;line-height:19px;margin-bottom:0px;margin-top:0px;text-align:left;\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">Don’t forget to check out the </span></span><span style=\"font-size:14px;font-weight:bold;\"><span lang=\"en\" dir=\"ltr\">social wall</span></span><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">, where you can interact with colleagues, share updates, and introduce yourself.&nbsp;</span></span></p>"
+                                    },
+                                    "elmIdx": "28a5aaa0425d9a47eb559d391ab080381b6c",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 0.52
+                        }
+                    ],
+                    "paddingBottom": 10,
+                    "paddingTop": 0,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "fe082d708e48e3172cb16017",
+                "title": "BZSRVzI6a0WS",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "cc62ba2ecfc03fab0ef05371abcebef1",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "containerBackgroundColor": "#f2f2f2",
+                                        "height": 10
+                                    },
+                                    "elmIdx": "ce940c2b6e2add8c428b16c66c8e47fb0b1d",
+                                    "type": "SPACER"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 0,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "fd35167030fbed0a26e2aeab",
+                "title": "Spacer",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "ffeef269ac39b116c1b62b36377d4541",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:24px;font-weight:bold;line-height:36px;text-align:center;\"><span style=\"color:#1f5796;font-weight:bold;\">Quick Links &amp; Resources</span></p>"
+                                    },
+                                    "elmIdx": "93807bd7a2759626b71a3a4be0328b69f473",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 5,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 5,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;line-height:24px;margin-bottom:0px;margin-top:0px;text-align:left;\" lang=\"en\" dir=\"ltr\"><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">Here’s everything you need to get started:</span></span></p><ul><li style=\"color:#01579B;font-family:Arial;font-size:14px;line-height:21px;\" lang=\"en\" dir=\"ltr\"><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.staffbase.com\"><span style=\"color:#01579B;font-size:14px;font-weight:bold;\"><ins><span lang=\"en\" dir=\"ltr\">Employee Handbook</span></ins></span></a><span style=\"color:#01579b;font-size:14px;font-weight:normal;\"><span lang=\"en\" dir=\"ltr\"> </span></span><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\">– All the policies and procedures in one place.</span></span></li><li style=\"color:#01579B;font-family:Arial;font-size:14px;line-height:21px;\" lang=\"en\" dir=\"ltr\"><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.staffbase.com\"><span style=\"color:#01579B;font-size:14px;font-weight:bold;\"><ins><span lang=\"en\" dir=\"ltr\">IT Support Portal</span></ins></span></a><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\"> – Need help setting up your tech? Submit a ticket here.</span></span></li><li style=\"color:#01579b;font-family:Arial;font-size:14px;line-height:21px;\" lang=\"en\" dir=\"ltr\"><span style=\"color:#01579b;font-size:14px;font-weight:bold;\"><ins><span lang=\"en\" dir=\"ltr\">Your Department Org Chart</span></ins></span><span style=\"font-size:14px;\"><span lang=\"en\" dir=\"ltr\"> – Learn who’s who on your team.</span></span></li></ul>"
+                                    },
+                                    "elmIdx": "d33326d21723e40f35050729495e28ea6a37",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 10,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "0fa327891cf17a1e6b6c490c",
+                "title": "BZSRVzI6a0WS",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "869a7d1fc682bcc138d355f82825bf12",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "containerBackgroundColor": "#f2f2f2",
+                                        "height": 10
+                                    },
+                                    "elmIdx": "124db6fe3418c3373c3665ae01472a940505",
+                                    "type": "SPACER"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "1a64817b8600aadbb6aec533",
+                "title": "Spacer",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "92eecbda110b158f3c10acae35c729ac",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:24px;font-weight:bold;line-height:36px;text-align:center;\"><span style=\"color:#1f5796;font-weight:bold;\"><span lang=\"en\" dir=\"ltr\">Stay Connected!</span></span></p>"
+                                    },
+                                    "elmIdx": "1480b7e2ef6f640632f5c63b6546499363f2",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "<p style=\"font-family:Arial;font-size:16px;line-height:16px;margin-bottom:0px;margin-top:0px;text-align:left;\"><span style=\"font-size:12px;\"><i>This email is internal only and specifically addressed to&nbsp;<span class=\"personalization\">{{firstName}}</span>&nbsp;<span class=\"personalization\">{{lastName}}</span>. Do not forward this email to anyone. In case, you are not&nbsp;<span class=\"personalization\">{{firstName}}</span>&nbsp;<span class=\"personalization\">{{lastName}}</span>&nbsp;please contact your HR manager.</i></span></p>"
+                                    },
+                                    "elmIdx": "76112913a44c0ce4526e2c029a0421ea05b1",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "center",
+                                        "iconSize": 26,
+                                        "iconVersionColor": true,
+                                        "icons": [
+                                            {
+                                                "active": true,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-instagram--alrg01W.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-instagram-CILfxEv9.png"
+                                                },
+                                                "title": "instagram"
+                                            },
+                                            {
+                                                "active": true,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-X-CT3bK6lN.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-X-BTTRxdP5.png"
+                                                },
+                                                "title": "X"
+                                            },
+                                            {
+                                                "active": true,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-youtube-BlAiovTO.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-youtube-C0svahPr.png"
+                                                },
+                                                "title": "youtube"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-facebook-CL8H2fYN.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-facebook-BAK0F8ZF.png"
+                                                },
+                                                "title": "facebook"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-email-BD3a09Rt.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-email-M87IgDKt.png"
+                                                },
+                                                "title": "email"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-flickr-BRHKwb6s.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-flickr-l7wtsqDX.png"
+                                                },
+                                                "title": "flickr"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-glassdoor-DtnoqTBu.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-glassdoor-uIa6uQPK.png"
+                                                },
+                                                "title": "glassdoor"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-pinterest-CtxpEfjk.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-pinterest-DUgcy8uo.png"
+                                                },
+                                                "title": "pinterest"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-slack-o_LMugVx.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-slack-0zF0WAnE.png"
+                                                },
+                                                "title": "slack"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-vimeo-C9t04BiF.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-vimeo-B95zZ-V1.png"
+                                                },
+                                                "title": "vimeo"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-website-BMnJy7iO.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-website-DDcna3Ia.png"
+                                                },
+                                                "title": "website"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-wechat-C7n-8zqX.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-wechat-pzMWDRAw.png"
+                                                },
+                                                "title": "wechat"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-weibo-DFAHWupe.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-weibo-ufhvyOAe.png"
+                                                },
+                                                "title": "weibo"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-workplace-CNtjHFPV.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-workplace-Cf-ynGPO.png"
+                                                },
+                                                "title": "workplace"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-yammer-CSrrlnBj.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-yammer-2eZV1N2Z.png"
+                                                },
+                                                "title": "yammer"
+                                            },
+                                            {
+                                                "active": false,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-microsoft-teams-Dhn7zx1t.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-microsoft-teams-CpjqFxAr.png"
+                                                },
+                                                "title": "microsoft-teams"
+                                            },
+                                            {
+                                                "active": true,
+                                                "href": "",
+                                                "src": {
+                                                    "bw": "https://de1.staffbasestatic.com/studio/assets/icon-social-linkedin-DwdZtm_K.png",
+                                                    "color": "https://de1.staffbasestatic.com/studio/assets/icon-social-color-linkedin-CNuPldgD.png"
+                                                },
+                                                "title": "linkedin"
+                                            }
+                                        ],
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10
+                                    },
+                                    "elmIdx": "428365811ebc912a28fb9aeb150a9e6b8387",
+                                    "type": "SOCIAL"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 10,
+                    "paddingTop": 10,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "a48991b4e88c803bb6d00ab1",
+                "title": "BZSRVzI6a0WS",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "dadb6284f00a7b9c2c920cdb12c0fffe",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 6.325911,
+                                        "href": "",
+                                        "mediumId": "676415584f1e60321c92c9e1",
+                                        "mimetype": "",
+                                        "paddingBottom": 0,
+                                        "paddingLeft": 0,
+                                        "paddingRight": 0,
+                                        "paddingTop": 0,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/c_limit,w_1160/676415584f1e60321c92c9e1.png"
+                                    },
+                                    "elmIdx": "873856cb030347b9ecf48f8f057463cf3a5c",
+                                    "type": "IMAGE"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 0,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#f2f2f2"
+                },
+                "index": "84e49d0e2878c9889a93ca1e",
+                "title": "XE0zRRVFc8N7",
+                "type": "CUSTOMIZED_BLOCK"
+            }
+        ]
+    }
+}

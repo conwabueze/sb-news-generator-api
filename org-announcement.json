@@ -1,0 +1,444 @@
+{
+    "title": "Org Announcement",
+    "content": {
+        "blocks": [
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "8f3216063501140ecee770fe13f5c321",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 4,
+                                        "href": "",
+                                        "mediumId": "67643d61be32e93c6adde5ac",
+                                        "mimetype": "",
+                                        "paddingBottom": 0,
+                                        "paddingLeft": 0,
+                                        "paddingRight": 0,
+                                        "paddingTop": 0,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/67643d61be32e93c6adde5ac.gif"
+                                    },
+                                    "elmIdx": "32fa5e1241ac46675503403d04b84e6b51d3",
+                                    "type": "IMAGE"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 0,
+                    "paddingTop": 0,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#ffffff"
+                },
+                "index": "3bb84e7ab2554ecb7742dd1a",
+                "title": "f9dIEKoNpK4R",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "d9240a1f8809b83311f976a6c4bceb43",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "\u003cp style=\"font-family:Arial;font-size:16px;line-height:24px;margin-bottom:0px;margin-top:0px;text-align:center;\"\u003e\u003cspan style=\"font-size:14px;font-weight:bold;\"\u003ePeople on the move\u003c/span\u003e\u003c/p\u003e"
+                                    },
+                                    "elmIdx": "3cc428cbee54c7533d15409a4d1269d6ceb2",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "\u003cp style=\"font-family:Arial;font-size:16px;line-height:24px;margin-bottom:0px;margin-top:0px;text-align:center;\"\u003e\u003cspan style=\"font-weight:bold;\"\u003eJanuary 2, 2025\u003c/span\u003e\u003c/p\u003e"
+                                    },
+                                    "elmIdx": "a7c06ec3b08d327acff2d887009a28e32d31",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 20,
+                    "paddingTop": 20,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#ffffff"
+                },
+                "index": "b1b6addece5a72ad0534be29",
+                "title": "62L7VxgY7NGH",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "53a05b6e8404ecf09d362430823f09b0",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 20,
+                                        "paddingRight": 20,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "\u003ch2 style=\"font-family:Arial;font-size:24px;font-weight:bold;line-height:36px;text-align:center;\" ck-header=\"defaultCK\"\u003eAnnouncements\u003c/h2\u003e"
+                                    },
+                                    "elmIdx": "39d4f2d6fc547ca6757ad8066fa0ae169a09",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 5,
+                    "paddingTop": 5,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#ffffff"
+                },
+                "index": "0772cf31733309a71ebf9dc4",
+                "title": "BZSRVzI6a0WS",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "9a7cd6ad5b5d99f444ea4962849fda09",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": 1.4998617,
+                                        "href": "",
+                                        "mediumId": "67643fa1f7e2995a70b9e72c",
+                                        "mimetype": "",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "src": "https://connectemail.staffbase.com/api/media/secure/external/v2/image/upload/c_limit,w_1160/67643fa1f7e2995a70b9e72c.jpg"
+                                    },
+                                    "elmIdx": "f1dfc7e53b6f541ae16e101c25b7aa6945a6",
+                                    "type": "IMAGE"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 20,
+                    "paddingTop": 20,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#ffffff"
+                },
+                "index": "81b3d122c6ca7810e82772df",
+                "title": "qNRSY6Ym/Axe",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 3,
+                    "columns": [
+                        {
+                            "columnIdx": "9331e2f5389cc33aea01180d812a1a0c",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": null,
+                                        "href": "",
+                                        "mimetype": "",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "src": "PLACE_HOLDER"
+                                    },
+                                    "elmIdx": "9ee40f65817a6decb7007731585a0fff3a9b",
+                                    "type": "IMAGE"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "\u003cp style=\"font-family:Arial;font-size:16px;line-height:24px;text-align:left;\"\u003e\u003cspan style=\"font-weight:bold;\"\u003eTip:\u003c/span\u003e Find a way to help employees relate to the content. Show them how it affects them personally. Use emotion or storytelling to give it heart and context, and you’ll have people reading in no time.\u003c/p\u003e"
+                                    },
+                                    "elmIdx": "2d87456578564eeaa7e7a43a52de10d6c677",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "center",
+                                        "backgroundColor": "#01579B",
+                                        "borderRadius": 3,
+                                        "color": "#FFF",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "fontStyle": "normal",
+                                        "fontWeight": "normal",
+                                        "href": "https://www.staffbase.com",
+                                        "innerHorizontalPadding": 10,
+                                        "innerVerticalPadding": 10,
+                                        "lineHeight": "16px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "text": "Button",
+                                        "textDecoration": "none"
+                                    },
+                                    "elmIdx": "2fa57c6087af1cb1f3e7f02f4303b9a8d58d",
+                                    "type": "BUTTON"
+                                }
+                            ],
+                            "size": 0.33333334
+                        },
+                        {
+                            "columnIdx": "22feaf1b63281eb2bf5b3af933cca2ea",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": null,
+                                        "href": "",
+                                        "mimetype": "",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "src": "PLACE_HOLDER"
+                                    },
+                                    "elmIdx": "466e99faf6461c43addcf0fa504a0f61c67d",
+                                    "type": "IMAGE"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "\u003cp style=\"font-family:Arial;font-size:16px;line-height:24px;text-align:left;\"\u003e\u003cspan style=\"font-weight:bold;\"\u003eTip:\u003c/span\u003e Find a way to help employees relate to the content. Show them how it affects them personally. Use emotion or storytelling to give it heart and context, and you’ll have people reading in no time.\u003c/p\u003e"
+                                    },
+                                    "elmIdx": "de7c3ea8cbd34c4e485273b37c5d892ac098",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "center",
+                                        "backgroundColor": "#01579B",
+                                        "borderRadius": 3,
+                                        "color": "#FFF",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "fontStyle": "normal",
+                                        "fontWeight": "normal",
+                                        "href": "https://www.staffbase.com",
+                                        "innerHorizontalPadding": 10,
+                                        "innerVerticalPadding": 10,
+                                        "lineHeight": "16px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "text": "Button",
+                                        "textDecoration": "none"
+                                    },
+                                    "elmIdx": "fac940839936f62c30f0a114d788413ec40e",
+                                    "type": "BUTTON"
+                                }
+                            ],
+                            "size": 0.33333334
+                        },
+                        {
+                            "columnIdx": "4dcad36e0656e1892bd755be930f3e99",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "alt": "",
+                                        "aspectRatio": null,
+                                        "href": "",
+                                        "mimetype": "",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "src": "PLACE_HOLDER"
+                                    },
+                                    "elmIdx": "99eb0505d1ab79db3d019423e99ca1b21a61",
+                                    "type": "IMAGE"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "24px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "\u003cp style=\"font-family:Arial;font-size:16px;line-height:24px;text-align:left;\"\u003e\u003cspan style=\"font-weight:bold;\"\u003eTip:\u003c/span\u003e Find a way to help employees relate to the content. Show them how it affects them personally. Use emotion or storytelling to give it heart and context, and you’ll have people reading in no time.\u003c/p\u003e"
+                                    },
+                                    "elmIdx": "9330ce1ad8abf5d707296ae688c6897ee5b1",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "center",
+                                        "backgroundColor": "#01579B",
+                                        "borderRadius": 3,
+                                        "color": "#FFF",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "fontStyle": "normal",
+                                        "fontWeight": "normal",
+                                        "href": "https://www.staffbase.com",
+                                        "innerHorizontalPadding": 10,
+                                        "innerVerticalPadding": 10,
+                                        "lineHeight": "16px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "text": "Button",
+                                        "textDecoration": "none"
+                                    },
+                                    "elmIdx": "f9e03a578e75dfa1a0a07de6bf0429189ccc",
+                                    "type": "BUTTON"
+                                }
+                            ],
+                            "size": 0.33333334
+                        }
+                    ],
+                    "paddingBottom": 20,
+                    "paddingTop": 20,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#ffffff"
+                },
+                "index": "3af85309a86a459c11e7602f",
+                "title": "Image Text Columns",
+                "type": "CUSTOMIZED_BLOCK"
+            },
+            {
+                "content": {
+                    "backgroundColor": "#ffffff",
+                    "columnNum": 1,
+                    "columns": [
+                        {
+                            "columnIdx": "fa98dbe4cf1fafd31055995f183acf7a",
+                            "columnItems": [
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "34px",
+                                        "paddingBottom": 0,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 0,
+                                        "textMarkupValue": "\u003ch1 style=\"font-family:Arial;font-size:16px;line-height:34px;text-align:left;\"\u003e“\u003c/h1\u003e"
+                                    },
+                                    "elmIdx": "62c425d0a5da9ca0e228812d1426067c2155",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "left",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "14px",
+                                        "lineHeight": "18.2px",
+                                        "paddingBottom": 0,
+                                        "paddingLeft": 35,
+                                        "paddingRight": 32,
+                                        "paddingTop": 0,
+                                        "textMarkupValue": "\u003cp style=\"font-family:Arial;font-size:14px;line-height:18px;text-align:left;\"\u003e\u003ci\u003eJust because you aren’t seeing huge jumps in the data, it doesn’t mean you aren’t improving. Measuring and testing your approach isn’t a one-time thing. It takes patience and consistency.\u003c/i\u003e\u003c/p\u003e"
+                                    },
+                                    "elmIdx": "d0f19e4e121bb5d059a38cc8869aab2ab273",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "right",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "16px",
+                                        "lineHeight": "36px",
+                                        "paddingBottom": 0,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 0,
+                                        "textMarkupValue": "\u003ch1 style=\"font-family:Arial;font-size:16px;line-height:37px;text-align:right;\"\u003e”\u003c/h1\u003e"
+                                    },
+                                    "elmIdx": "47eb11c555a91a4111d87f49d63ae946e4fe",
+                                    "type": "PARAGRAPH"
+                                },
+                                {
+                                    "content": {
+                                        "align": "right",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "14px",
+                                        "lineHeight": "21px",
+                                        "paddingBottom": 10,
+                                        "paddingLeft": 10,
+                                        "paddingRight": 10,
+                                        "paddingTop": 10,
+                                        "textMarkupValue": "\u003cp style=\"font-family:Arial;font-size:14px;line-height:21px;text-align:right;\"\u003e\u003cspan style=\"font-weight:bold;\"\u003e— AUTHOR\u003c/span\u003e\u003c/p\u003e"
+                                    },
+                                    "elmIdx": "f7169a689464db82acbcb8aa83097fc617a9",
+                                    "type": "PARAGRAPH"
+                                }
+                            ],
+                            "size": 1
+                        }
+                    ],
+                    "paddingBottom": 20,
+                    "paddingTop": 20,
+                    "structureLocked": false,
+                    "wrapperBackgroundColor": "#ffffff"
+                },
+                "index": "6d2e1aa583e1f34aac431ff1",
+                "title": "Quote",
+                "type": "CUSTOMIZED_BLOCK"
+            }
+        ]
+    }
+}
