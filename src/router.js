@@ -26,5 +26,9 @@ router.post('/installations',
     body('workdayMerge').optional().isArray().withMessage('Please make sure you are using a array value for workdayMerge'),
     handleInputErrors,
     installations);
-router.post('/generate/email-templates', templateGeneration);
+router.post('/generate/email-templates',
+    body('domain').isString().withMessage("Please make sure you add a 'domain'. Make sure it is a string"),
+    handleInputErrors,
+    templateGeneration,
+);
 export default router;

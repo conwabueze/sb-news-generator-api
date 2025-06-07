@@ -41,7 +41,6 @@ export const getTemplate = async (token, domain, templateId) => {
 
 export const getExistingTemplates = async (token, domain) => {
     const url = `https://${domain}/api/email-service/templates?limit=100`;
-
     const headers = {
         'Authorization': `Basic ${token}`,
         'Content-Type': 'application/json'
@@ -65,7 +64,7 @@ export const getExistingTemplateNames = async (token, domain) => {
     for (const template of getTemplates.data.data) {
         templateNames.push(template.name);
     }
-    return templateNames;
+    return { success: true, data: templateNames };
 
 }
 
@@ -139,4 +138,22 @@ export const uploadEmailMediaToStaffbase = async (apiToken, domain, imageUrl, fi
     } catch (error) {
         return { success: false, error, errorMessage: `Error uploading image to Staffbase: ${error?.message || error}` };
     }
+};
+
+export const retryFunction = async (func, maxRetries = 3, ...args) => {
+    let retries = 0;
+
+    while (retries < maxRetries) {
+        const result = await func(...args);
+
+        if (result.success) {
+            return result; // Success, return the result
+        } else {
+            console.warn(`Function call failed. Retrying... (Attempt ${retries + 1} of ${maxRetries})`);
+            retries++;
+        }
+    }
+
+    console.error(`Function failed after ${maxRetries} attempts.`);
+    return { success: false, errorMessage: `Function failed after ${maxRetries} attempts.`, originalError: null }; // All retries failed
 };
