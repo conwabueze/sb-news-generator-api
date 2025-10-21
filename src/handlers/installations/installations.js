@@ -25,7 +25,7 @@ export const installations = async (req, res, next) => {
     const workdayMerge = req.body.hasOwnProperty("workdayMerge") ? req.body.workdayMerge : undefined;
 
     //A accessor ID is needed for almost all the the scripts. Thus we start by getting the accessorID
-    const spaces = await getSBSpaces(sbAuthKey);
+    const spaces = await getSBSpaces(undefined, sbAuthKey);
 
     //Check if we were able tp successfully pull in the space data
     //For some reason pulling spaces with a wrong permission token does not return a auth error, just undefined. This is why we check for undefined in the data return.

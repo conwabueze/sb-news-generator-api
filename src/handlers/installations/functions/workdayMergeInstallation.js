@@ -6,8 +6,13 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
         //browser = await puppeteer.launch({ headless: true, defaultViewport: null, args: ['--no-sandbox']  }); // Set headless to false to see the browser
         browser = await puppeteer.launch({
             headless: 'new',
+            //headless: false,
             args: ['--no-sandbox'],
-          });
+            // defaultViewport: {
+            //     width: 1920,
+            //     height: 1080
+            // }
+        });
         const page = await browser.newPage();
 
         //sign in to studio
@@ -15,12 +20,20 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
             waitUntil: 'networkidle0', // or 'load'
             timeout: 60000, // 60 seconds
         });
-        await page.waitForSelector('input[name="identifier"]');
-        await page.click('input[name="identifier"]');
-        await page.type('input[name="identifier"]', email);
-        await page.waitForSelector('input[name="secret"]');
-        await page.click('input[name="secret"]');
-        await page.type('input[name="secret"]', password);
+        // await page.waitForSelector('input[name="identifier"]');
+        // await page.click('input[name="identifier"]');
+        // await page.type('input[name="identifier"]', email);
+        // await page.waitForSelector('input[name="secret"]');
+        // await page.click('input[name="secret"]');
+        // await page.type('input[name="secret"]', password);
+        await page.waitForSelector('button[data-view-link="signin"]'); //wait for sign-in button
+        await page.click('button[data-view-link="signin"]'); //click sign in button
+        await page.waitForSelector('input[name="identifier"]'); // Wait for the email/identifier input field to be present.
+        await page.click('input[name="identifier"]'); // Click on the email/identifier input field to focus it.
+        await page.type('input[name="identifier"]', email); // Type the provided email address into the input field.
+        await page.waitForSelector('input[name="secret"]'); // Wait for the password input field to be present.
+        await page.click('input[name="secret"]'); // Click on the password input field to focus it.
+        await page.type('input[name="secret"]', password); // Type the provided password into the input field.
         await new Promise(resolve => setTimeout(resolve, 2000));
         await page.waitForSelector('button[type="submit"]');
         await page.click('button[type="submit"]');
@@ -59,10 +72,14 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
             return false; // Indicate that no matching element was found
         }, selector, targetInnerHTML);
 
-        if(!searchForElement){
+        if (!searchForElement) {
             await browser.close();
             return 'ERROR: Could on find user identifier. Please make sure you are selecting a identifier that exist';
         }
+
+        const classSelector = '.ds-text-input__base-input';
+        await page.waitForSelector(classSelector);
+        await page.type(classSelector, 'Workday Integration');
 
         await page.waitForSelector('button.ds-modal__button--accept');
         await page.click('button.ds-modal__button--accept');
@@ -92,8 +109,8 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
             }
             return false; // Indicate that no matching element was found
         }, selector, targetInnerHTML);
-        
-        
+
+
         await new Promise(resolve => setTimeout(resolve, 5000));
 
         //click I am an admin button
@@ -185,7 +202,7 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
         await iframeContentFrame.waitForSelector(selector);
         await iframeContentFrame.click(selector);
 
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 7000));
 
         //close browser
         await browser.close();
@@ -193,7 +210,7 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
 
 
     } catch (error) {
-        if(browser)
+        if (browser)
             await browser.close();
         console.log(error);
         return 'ERROR: There was a issue running the workday integration. Make sure you are entering in the correct creds. Run this script again and if issue keeps persisting please reachout to the manager of this script';

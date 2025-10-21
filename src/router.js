@@ -12,6 +12,7 @@ router.post('/bulkscrape/linkedin/article',
     body('channelID').isString().withMessage("Please make sure you add a 'channelID'. Make sure it is a string"),
     body('pageURL').isString().withMessage("Please make sure you add a 'pageURL'. Make sure it is a string"),
     body('totalPosts').optional().isNumeric().withMessage("Make sure 'totalPost' is a numeric value"),
+    body('domain').optional().isString().withMessage("Make sure 'domain' is a string value"),
     handleInputErrors,
     bulkScrapeLinkedinToStaffbaseArticle
 );

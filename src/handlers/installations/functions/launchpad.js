@@ -18,19 +18,19 @@ const applicationDatabase = {
         title: 'Outlook',
         url: 'https://outlook.office.com/mail/',
         description: 'Email, Mircosoft, Mail',
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Microsoft_Office_Outlook_%282018%E2%80%93present%29.svg/826px-Microsoft_Office_Outlook_%282018%E2%80%93present%29.svg.png'
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Outlook.com_icon_%282012-2019%29.svg/2028px-Outlook.com_icon_%282012-2019%29.svg.png'
     },
     word: {
         title: 'Word',
         url: 'https://www.microsoft.com/en-us/microsoft-365/word',
         description: 'Notes, Document, Document Creation, Files',
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Microsoft_Office_Word_%282019%E2%80%93present%29.svg/2203px-Microsoft_Office_Word_%282019%E2%80%93present%29.svg.png'
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Microsoft_Office_Word_%282019%E2%80%932025%29.svg/1101px-Microsoft_Office_Word_%282019%E2%80%932025%29.svg.png'
     },
     powerpoint: {
         title: 'Powerpoint',
         url: 'https://www.microsoft.com/en-us/microsoft-365/powerpoint',
         description: 'Slides, Presentations',
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Microsoft_Office_PowerPoint_%282019%E2%80%93present%29.svg/2203px-Microsoft_Office_PowerPoint_%282019%E2%80%93present%29.svg.png'
+        image: 'https://cdn.pixabay.com/photo/2021/01/30/12/18/powerpoint-5963677_1280.png'
     },
     excel: {
         title: 'Excel',
@@ -263,7 +263,7 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
 
         FUTURE NOTE: The situations for adding the launchpadItems could most likely be consolidated in a future
         improvement of the script if ever needed.
-    */ 
+    */
     //Situation #1: No apps are currently in the launchpad and they want all the applications offerred
     //loop through application database and add all apps currently available 
     if (currentLaunchpadApps === undefined && desiredApplications[0] === 'all') {

@@ -3,6 +3,7 @@ import { ApifyClient } from 'apify-client';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from 'axios';
 import sharp from 'sharp'; // Or import sizeOf from 'image-size';
+import { isErrorLike } from 'puppeteer';
 
 
 /**
@@ -93,6 +94,7 @@ export const scrapeLinkedinPostsRawData = async (cookies, totalPosts, pageURL) =
                 "apifyProxyCountry": "US"
             },
             "limitPerSource": totalPosts,
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
         };
         // Run the Actor and wait for it to finish
         const run = await client.actor("kfiWbq3boy3dWKbiL").call(input);
@@ -103,6 +105,7 @@ export const scrapeLinkedinPostsRawData = async (cookies, totalPosts, pageURL) =
         //return results
         return { success: true, items };
     } catch (error) {
+        console.log(error);
         return { success: false, error };
         //res.status(500).json({ error: `There was an error pulling Linkedln posts: ${error.message}` });
     }
@@ -119,7 +122,7 @@ export const scrapeLinkedinPostsRawData = async (cookies, totalPosts, pageURL) =
 export const generateArticleText = async (articleReference) => {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         //Example to provide gemeni to assure that the generates article body is in the structure of a standard article.
         const structureExample = `Starting a blog was one of the most rewarding things I’ve done in my career. As someone who loves writing and connecting with readers, having an outlet to share my thoughts while potentially helping others has been an incredible experience.
@@ -160,7 +163,7 @@ export const generateArticleText = async (articleReference) => {
 export const generateUpdateText = async (reference) => {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         //Actual prompt we will be giving to AI to generate the articles body
         const prompt = `Generate a paragraph, short or long, with no hashtags that I can post to social media. The generate paragraph should be wrapped in html paragraph element text. For any links generated in your text, please wrap them in text based html anchor elements (<a></a>). Please do no include any hashtags. Base your post on the following text:  \n ${reference}`;
@@ -185,7 +188,7 @@ export const generateUpdateText = async (reference) => {
 export const generateContentText = async (reference, contentType) => {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         let contentText = '';
 
         if (contentType === 'articles') {
@@ -248,14 +251,14 @@ export const generateContentText = async (reference, contentType) => {
     }
 }
 
-export const getChannelType = async (authKey, channelID) => {
+export const getChannelType = async (domain = 'app.staffbase.com', authKey, channelID) => {
     try {
         //Authorization Header
         const headers = {
             Authorization: `Basic ${authKey}`,
 
         }
-        const baseUrl = `https://app.staffbase.com/api/channels/${channelID}`;
+        const baseUrl = `https://${domain}/api/channels/${channelID}`;
         const response = await axios.get(baseUrl, { headers });
         return response.data.contentType;
     } catch (error) {
@@ -272,7 +275,7 @@ export const getChannelType = async (authKey, channelID) => {
  * @param {string} articleImage - url to image for article
  * 
  */
-export const createStaffbaseArticle = async (authKey, channelID, articleTitle, articelBody, imageObject = '') => {
+export const createStaffbaseArticle = async (domain = 'app.staffbase.com', authKey, channelID, articleTitle, articelBody, imageObject = '') => {
 
     try {
         //Authorization Header
@@ -280,14 +283,14 @@ export const createStaffbaseArticle = async (authKey, channelID, articleTitle, a
             Authorization: `Basic ${authKey}`,
 
         }
-        const baseUrl = `https://app.staffbase.com/api/channels/${channelID}/posts`;
+        const baseUrl = `https://${domain}/api/channels/${channelID}/posts`;
         let imageBody = null;
         if (imageObject !== '') {
             const imageIDRegex = /upload\/t_preview\/([a-f0-9]{24})\.jpg\?.*$/; // Regular expression pattern
             const imageIDMatch = imageObject.url.match(imageIDRegex);
             const imageID = imageIDMatch[1].trim();
-            const originalImageURL = `https://app.staffbase.com/api/media/secure/external/v2/image/upload/${imageID}.jpg`;
-            const thumbImageURL = `https://app.staffbase.com/api/media/secure/external/v2/image/upload/g_faces:center,c_fill,w_240,h_135/${imageID}.jpg`
+            const originalImageURL = `https://${domain}/api/media/secure/external/v2/image/upload/${imageID}.jpg`;
+            const thumbImageURL = `https://${domain}/api/media/secure/external/v2/image/upload/g_faces:center,c_fill,w_240,h_135/${imageID}.jpg`
 
             imageBody = {
                 original: {
@@ -353,8 +356,8 @@ export const createStaffbaseChannel = async (apiToken, channelName) => {
 
 
 
-export const uploadMediaToStaffbase = async (apiToken, imageUrl, fileName, minWidth = 400, minHeight = 100) => {
-    const baseUrl = `https://app.staffbase.com/api/media`;
+export const uploadMediaToStaffbase = async (domain = 'app.staffbase.com', apiToken, imageUrl, fileName, minWidth = 400, minHeight = 100) => {
+    const baseUrl = `https://${domain}/api/media`;
 
     try {
         const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });

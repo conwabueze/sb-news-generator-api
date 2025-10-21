@@ -373,6 +373,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
     /*** 1. check to see if there are campigns. If yes, store the names and ids***/
     const campaigns = await getCampaigns(sbAuthKey);
     if (!campaigns.success) {
+        console.log(campaigns.data);
         responseBody['errors']['Campaign Get Error'] = 'Error getting campaigns';
         return responseBody;
     }

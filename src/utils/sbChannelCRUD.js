@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export const getSBNewsChannel = async (authKey, channelID) => {
+export const getSBNewsChannel = async (domain = 'app.staffbase.com', authKey, channelID) => {
 
-    const url = `https://app.staffbase.com/api/channels/${channelID}`;
+    const url = `https://${domain}/api/channels/${channelID}`;
 
     const headers = {
         'Authorization': `Basic ${authKey}`,
@@ -20,9 +20,9 @@ export const getSBNewsChannel = async (authKey, channelID) => {
 
 }
 
-export const createSBNewsChannel = async (authKey, channelName, accessorIDs = [], adminIDs = '', contentType = 'articles') => {
+export const createSBNewsChannel = async (domain = 'app.staffbase.com', authKey, channelName, accessorIDs = [], adminIDs = '', contentType = 'articles') => {
 
-    const url = 'https://app.staffbase.com/api/installations';
+    const url = `https://${domain}/api/installations`;
 
     const data = {
         "pluginID": "news",
@@ -130,7 +130,7 @@ export const updateSBNewsChannel = async (authKey, channelName, channelID, acces
 
 }
 
-export const addNewsPageToSBNewsChannel = async (sbAuthKey, accessorIds, newspageId ,channelId) => {
+export const addNewsPageToSBNewsChannel = async (sbAuthKey, accessorIds, newspageId, channelId) => {
     const url = `https://app.staffbase.com/api/spaces/${accessorIds}/menu`;
 
     const headers = {
@@ -161,55 +161,56 @@ export const addNewsPageToSBNewsChannel = async (sbAuthKey, accessorIds, newspag
 }
 
 export const addNewsPageToSBNewsChannelWithRetry = async (
+    domain = 'app.staffbase.com',
     sbAuthKey,
     accessorIds,
     newspageId,
     channelId,
     maxRetries = 5, // Set a maximum number of retries
     retryDelayMs = 2000 // Set a delay between retries in milliseconds
-  ) => {
+) => {
     let retries = 0;
     let result = { success: false };
-  
+
     while (!result.success && retries < maxRetries) {
-      try {
-        const url = `https://app.staffbase.com/api/spaces/${accessorIds}/menu`;
-        const headers = {
-          'Authorization': `Basic ${sbAuthKey}`,
-          'Content-Type': 'application/json',
-        };
-        const data = [
-          {
-            op: 'add',
-            path: `/${newspageId}/0`,
-            value: {
-              installationID: channelId,
-              nodeType: 'installation',
-              pluginID: 'news',
-            },
-          },
-        ];
-  
-        const response = await axios.patch(url, data, { headers });
-        result = { success: true, data: response.data };
-        return result; // If successful, exit the loop and return
-      } catch (error) {
-        console.error(`Attempt ${retries + 1} failed:`, error);
-        result = { success: false, data: error };
-        retries++;
-        if (retries < maxRetries) {
-          await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        try {
+            const url = `https://${domain}/api/spaces/${accessorIds}/menu`;
+            const headers = {
+                'Authorization': `Basic ${sbAuthKey}`,
+                'Content-Type': 'application/json',
+            };
+            const data = [
+                {
+                    op: 'add',
+                    path: `/${newspageId}/0`,
+                    value: {
+                        installationID: channelId,
+                        nodeType: 'installation',
+                        pluginID: 'news',
+                    },
+                },
+            ];
+
+            const response = await axios.patch(url, data, { headers });
+            result = { success: true, data: response.data };
+            return result; // If successful, exit the loop and return
+        } catch (error) {
+            console.error(`Attempt ${retries + 1} failed:`, error);
+            result = { success: false, data: error };
+            retries++;
+            if (retries < maxRetries) {
+                await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+            }
         }
-      }
     }
-  
+
     console.error(`Failed after ${maxRetries} attempts.`);
     return result; // Return the final (failed) result if max retries are reached
-  };
+};
 
-export const deleteSBNewsChannel = async (authKey, channelID) => {
+export const deleteSBNewsChannel = async (domain = 'app.staffbase.com', authKey, channelID) => {
 
-    const url = `https://app.staffbase.com/api/installations/${channelID}`;
+    const url = `https://${domain}/api/installations/${channelID}`;
 
     const headers = {
         'Authorization': `Basic ${authKey}`,
@@ -227,8 +228,8 @@ export const deleteSBNewsChannel = async (authKey, channelID) => {
 
 }
 
-export const publishSBNewsChannel = async (authKey, channelID) => {
-    const url = `https://app.staffbase.com/api/installations/${channelID}/publish`;
+export const publishSBNewsChannel = async (domain = 'app.staffbase.com', authKey, channelID) => {
+    const url = `https://${domain}/api/installations/${channelID}/publish`;
 
     const headers = {
         'Authorization': `Basic ${authKey}`,
@@ -285,8 +286,8 @@ export const getSBNewsChannels = async (authKey) => {
     }
 }
 
-export const getSBNewsChannelsBranch = async (authKey) => {
-    const url = `https://app.staffbase.com/api/branch/channels?limit=100`;
+export const getSBNewsChannelsBranch = async (domain = 'app.staffbase.com', authKey) => {
+    const url = `https://${domain}/api/branch/channels?limit=100`;
 
     const headers = {
         'Authorization': `Basic ${authKey}`,
@@ -326,8 +327,8 @@ export const getSBPage = async (authKey, pageID) => {
 
 }
 
-export const getSBSpaces = async (authKey) => {
-    const url = `https://app.staffbase.com/api/spaces`;
+export const getSBSpaces = async (domain = 'app.staffbase.com', authKey) => {
+    const url = `https://${domain}/api/spaces`;
 
     const headers = {
         'Authorization': `Basic ${authKey}`,
@@ -345,8 +346,8 @@ export const getSBSpaces = async (authKey) => {
     }
 }
 
-export const getSBUsers = async (authKey) => {
-    const url = 'https://app.staffbase.com/api/users?';
+export const getSBUsers = async (domain = 'app.staffbase.com', authKey) => {
+    const url = `https://${domain}/api/users?`;
 
     const headers = {
         'Authorization': `Basic ${authKey}`,
@@ -373,8 +374,8 @@ export const getSBUsers = async (authKey) => {
 * The object contains a `success` boolean indicating if the request was successful,
 * and a `data` property which holds either the menu data (if successful) or the error object (if failed).
 */
-const getMenu = async (sbAuthKey, accessorIds) => {
-    const url = `https://app.staffbase.com/api/spaces/${accessorIds}/menu`;
+const getMenu = async (domain = 'app.staffbase.com', sbAuthKey, accessorIds) => {
+    const url = `https://${domain}/api/spaces/${accessorIds}/menu`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -444,10 +445,10 @@ const getNestedMenuNewsPages = async (sbAuthKey, accessorIds, nestedMenuId, look
 
 }
 
-export const getAllNewPages = async (sbAuthKey, accessorIds, lookingFor) => {
+export const getAllNewPages = async (domain = 'app.staffbase.com', sbAuthKey, accessorIds, lookingFor) => {
     const returnObject = {}
     // Fetch the current menu structure for the specified Staffbase space.
-    const menu = await getMenu(sbAuthKey, accessorIds);
+    const menu = await getMenu(domain, sbAuthKey, accessorIds);
     if (!menu.success) {
         return { success: false, error: 'Issue fetching menu. Please try again. If problem persist, please reach out to manager of Script' }
     }

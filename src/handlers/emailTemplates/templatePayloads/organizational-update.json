@@ -4,6 +4,7 @@
         "https://storage.googleapis.com/staffbase-email-images/Organizational%20Update/orgUpdate-0.png",
         "https://storage.googleapis.com/staffbase-email-images/Organizational%20Update/orgUpdate-1.jpg"
     ],
+    "thumbnailUrl": "https://storage.googleapis.com/staffbase-email-images/Organizational%20Update/orgUpdate-2.jpeg",
     "content": {
         "blocks": [
             {
@@ -25,7 +26,7 @@
                                         "paddingLeft": 10,
                                         "paddingRight": 10,
                                         "paddingTop": 10,
-                                        "src": "https://app.staffbase.com/api/media/secure/external/v2/image/upload/68407df3b16034429fee4997.png"
+                                        "src": "replace me"
                                     },
                                     "elmIdx": "553459b465072b0dd91f1832e1584c063708",
                                     "type": "IMAGE"
@@ -76,7 +77,7 @@
                                         "paddingLeft": 10,
                                         "paddingRight": 10,
                                         "paddingTop": 0,
-                                        "src": "https://app.staffbase.com/api/media/secure/external/v2/raw/upload/68407c4f7abb210e25f064d7.jpg"
+                                        "src": "replace me"
                                     },
                                     "elmIdx": "65fa6c011ac1d3e503dc441488d055bce6d3",
                                     "type": "IMAGE"

@@ -1,6 +1,25 @@
 import axios from 'axios';
 
-export const createTemplate = async (token, domain, title) => {
+export const getSBSpaces = async (token, domain) => {
+    const url = `https://${domain}/api/spaces`;
+
+    const headers = {
+        'Authorization': `Basic ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    const data = {};
+
+    try {
+        const response = await axios.get(url, { headers });
+        const data = response.data.data;
+        return { success: true, data };
+    } catch (error) {
+        return { success: false, error };
+    }
+}
+
+export const createTemplate = async (token, domain, title, galleryId) => {
     const url = `https://${domain}/api/email-service/templates`;
 
     const headers = {
@@ -9,6 +28,7 @@ export const createTemplate = async (token, domain, title) => {
     };
 
     const payload = {
+        galleryId,
         "name": `${title}`,
         "renderingMode": "designer",
     };
@@ -17,6 +37,7 @@ export const createTemplate = async (token, domain, title) => {
         const response = await axios.post(url, payload, { headers });
         return { success: true, data: response.data }
     } catch (error) {
+        console.log(error);
         return { success: false, data: error }
     }
 
@@ -34,13 +55,15 @@ export const getTemplate = async (token, domain, templateId) => {
         const response = await axios.get(url, { headers });
         return { success: true, data: response.data }
     } catch (error) {
+        console.log(error);
         return { success: false, data: error }
     }
 
 }
 
-export const getExistingTemplates = async (token, domain) => {
-    const url = `https://${domain}/api/email-service/templates?limit=100`;
+export const getTemplateGallery = async (token, domain) => {
+    const url = `https://${domain}/api/email-service/galleries?limit=20`;
+
     const headers = {
         'Authorization': `Basic ${token}`,
         'Content-Type': 'application/json'
@@ -50,13 +73,56 @@ export const getExistingTemplates = async (token, domain) => {
         const response = await axios.get(url, { headers });
         return { success: true, data: response.data }
     } catch (error) {
+        console.log(error);
         return { success: false, data: error }
     }
 
 }
 
-export const getExistingTemplateNames = async (token, domain) => {
-    const getTemplates = await getExistingTemplates(token, domain);
+export const createTemplateGallery = async (token, domain, name, description, accessorIds, adminIds) => {
+    const url = `https://${domain}/api/email-service/galleries?limit=20`;
+
+    const headers = {
+        'Authorization': `Basic ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    const payload = {
+        name,
+        description,
+        accessorIds,
+        adminIds
+    }
+    try {
+        const response = await axios.post(url, payload, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        console.log(error);
+        return { success: false, data: error }
+    }
+
+}
+
+export const getExistingTemplates = async (token, domain, galleryId) => {
+    const url = `https://${domain}/api/email-service/templates?limit=100&galleryId=${galleryId}`;
+    const headers = {
+        'Authorization': `Basic ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        console.log(error);
+        return { success: false, data: error }
+    }
+
+}
+
+export const getExistingTemplateNames = async (token, domain, galleryId) => {
+    const getTemplates = await getExistingTemplates(token, domain, galleryId);
+    console.log(getTemplates.data);
     if (!getTemplates.success) {
         return { success: false, data: 'error getting existing templates' };
     }
@@ -84,6 +150,28 @@ export const putContentToTemplate = async (token, domain, templateId, content) =
         const response = await axios.put(url, payload, { headers });
         return { success: true, data: response.data }
     } catch (error) {
+        console.log(error);
+        return { success: false, data: error }
+    }
+};
+
+export const addTemplateCoverImage = async (token, domain, templateId, imageUrl) => {
+    const url = `https://${domain}/api/email-service/templates/${templateId}`;
+
+    const headers = {
+        'Authorization': `Basic ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    const payload = {
+        "thumbnailUrl": imageUrl
+    };
+
+    try {
+        const response = await axios.patch(url, payload, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        console.log(error);
         return { success: false, data: error }
     }
 };
@@ -136,6 +224,7 @@ export const uploadEmailMediaToStaffbase = async (apiToken, domain, imageUrl, fi
             },
         };
     } catch (error) {
+        console.log(error);
         return { success: false, error, errorMessage: `Error uploading image to Staffbase: ${error?.message || error}` };
     }
 };

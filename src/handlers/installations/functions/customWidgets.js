@@ -47,7 +47,10 @@ export const customWidgetsInstallation = async (email, password) => {
         "job-postings": "https://eirastaffbase.github.io/job-postings/dist/staffbase.job-postings.js",
         "weather-time": "https://eirastaffbase.github.io/weather-time/dist/eira.weather-time.js",
         "count-up": "https://maximizeit.github.io/sb-custom-widget-countup/dist/maximize-it.custom-widget-countup.js",
-        "count-down": "https://maximizeit.github.io/sb-custom-widget-countdown/dist/maximize-it.custom-widget-countdown.js"
+        "count-down": "https://maximizeit.github.io/sb-custom-widget-countdown/dist/maximize-it.custom-widget-countdown.js",
+        "salesforce widget": "https://eirastaffbase.github.io/widgets/salesforce-viewer/dist/staffbase.salesforce-viewer.js",
+        "task list": "https://eirastaffbase.github.io/widgets/static-tasks/dist/staffbase.static-tasks.js",
+        "shift viewer": "https://eirastaffbase.github.io/widgets/shift-viewer/dist/staffbase.shift-viewer.js"
     }
 
     let browser = undefined; // Initialize a variable to hold the Puppeteer browser instance.
@@ -58,8 +61,13 @@ export const customWidgetsInstallation = async (email, password) => {
         //browser = await puppeteer.launch({ headless: true, defaultViewport: null, args: ['--no-sandbox'] });
         browser = await puppeteer.launch({
             headless: 'new',
+            //headless: false,
             args: ['--no-sandbox'],
-          });
+            // defaultViewport: {
+            //     width: 1920,
+            //     height: 1080
+            // }
+        });
 
         const page = await browser.newPage(); // Create a new page within the browser.
 
@@ -68,6 +76,8 @@ export const customWidgetsInstallation = async (email, password) => {
             waitUntil: 'networkidle0', // Wait until there are no more network connections for at least 500 ms (considered stable).
             timeout: 60000, // Set a timeout of 60 seconds for the page to load.
         });
+        await page.waitForSelector('button[data-view-link="signin"]'); //wait for sign-in button
+        await page.click('button[data-view-link="signin"]'); //click sign in button
         await page.waitForSelector('input[name="identifier"]'); // Wait for the email/identifier input field to be present.
         await page.click('input[name="identifier"]'); // Click on the email/identifier input field to focus it.
         await page.type('input[name="identifier"]', email); // Type the provided email address into the input field.
@@ -83,7 +93,7 @@ export const customWidgetsInstallation = async (email, password) => {
 
         // --- Step 3: Add each custom widget from the list ---
         const widgetOptions = Object.keys(customWidgetList); // Get an array of the widget names (keys from customWidgetList).
-        for(const customWidget of widgetOptions){
+        for (const customWidget of widgetOptions) {
             // Wait for the input field where the widget URL is entered.
             await page.waitForSelector('input[placeholder="Enter the URL, e.g. https://staffba.se/customwidget.js"]');
             // Type the URL of the current custom widget into the input field.
@@ -104,7 +114,7 @@ export const customWidgetsInstallation = async (email, password) => {
     } catch (error) {
         // --- Error Handling ---
         // If any error occurred during the process, ensure the browser is closed if it was launched.
-        if(browser)
+        if (browser)
             await browser.close();
         console.log(error);
         return "ERROR: Custom widgets were unsucceessfully added"; // Return false to indicate that an error occurred.
