@@ -123,7 +123,7 @@ const applicationDatabase = {
  * @async
  * @function getLaunchpad
  * @description Retrieves a list of launchpad applications for env in Staffbase.
- *
+ * @param {string} domain - domain of Staffbase site
  * @param {string} sbAuthKey - The Staffbase API authentication key.
  *
  * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
@@ -136,8 +136,8 @@ const applicationDatabase = {
  *
  * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
  */
-const getLaunchpad = async (sbAuthKey) => {
-    const url = 'https://app.staffbase.com/api/branch/launchpad/apps';
+const getLaunchpad = async (domain = 'app.staffbase.com', sbAuthKey) => {
+    const url = `https://${domain}/api/branch/launchpad/apps`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -156,7 +156,8 @@ const getLaunchpad = async (sbAuthKey) => {
  * @async
  * @function addToLaunchpad
  * @description Adds a new application to the Staffbase launchpad.
- *
+ * 
+ * @param {string} domain - domain of Staffbase site
  * @param {string} sbAuthKey - The Staffbase API authentication key.
  * @param {string[]} accessorIDs - An array of accessor IDs that will have access to this launchpad application.
  * @param {string} appURL - The URL of the application to be added to the launchpad.
@@ -174,8 +175,8 @@ const getLaunchpad = async (sbAuthKey) => {
  *
  * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
  */
-const addToLaunchpad = async (sbAuthKey, accessorIDs, appURL, image, title, description) => {
-    const url = 'https://app.staffbase.com/api/branch/launchpad/apps';
+const addToLaunchpad = async (domain = 'app.staffbase.com', sbAuthKey, accessorIDs, appURL, image, title, description) => {
+    const url = `https://${domain}/api/branch/launchpad/apps`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -211,7 +212,8 @@ const addToLaunchpad = async (sbAuthKey, accessorIDs, appURL, image, title, desc
  * @async
  * @function launchpadInstallation
  * @description Manages the installation of applications into a Staffbase launchpad. It can add all available applications or a specific list of desired applications, while also checking for existing applications to avoid duplicates.
- *
+ * 
+ * @param {string} domain - domain of Staffbase site
  * @param {string} sbAuthKey - The Staffbase API authentication key. This should be a base64 encoded string of your API credentials.
  * @param {string[]} accessorIDs - An array of accessor IDs. The function likely uses the first element to identify the target space for the launchpad.
  * @param {string[]} desiredApplications - An array of application names to be added to the launchpad. You can also pass `['all']` to add all applications available in the `applicationDatabase`.
@@ -220,7 +222,7 @@ const addToLaunchpad = async (sbAuthKey, accessorIDs, appURL, image, title, desc
  * - `'Apps Added Successfully'`: An array of application titles that were successfully added to the launchpad.
  * - `'Apps Added Unsuccessfully'`: An array of application titles that were not added, along with potential reasons (e.g., API error, not found in database).
  */
-export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredApplications) => {
+export const launchpadInstallation = async (domain = 'app.staffbase.com', sbAuthKey, accessorIDs, desiredApplications) => {
     //response body used as return once function is executed
     const responseBody = {};
 
@@ -229,7 +231,7 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
     const appsInApplicationDatabase = Object.keys(applicationDatabase);
 
     //now we get the launchpad from the env in order to later pull on applications living in the launchpad by name
-    const launchpad = await getLaunchpad(sbAuthKey);
+    const launchpad = await getLaunchpad(domain, sbAuthKey);
 
     //currentLaunchpadApps is the variable used for storing a array of all applications currently luving in the launchpad by name
     let currentLaunchpadApps = undefined;
@@ -269,7 +271,7 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
     if (currentLaunchpadApps === undefined && desiredApplications[0] === 'all') {
         const postPromises = appsInApplicationDatabase.map(async app => {
             const currApp = applicationDatabase[app];
-            const post = await addToLaunchpad(sbAuthKey, accessorIDs, currApp.url, currApp.image, currApp.title, currApp.description);
+            const post = await addToLaunchpad(domain, sbAuthKey, accessorIDs, currApp.url, currApp.image, currApp.title, currApp.description);
             if (!post.success)
                 appsNotAdded.push(currApp.title);
             else
@@ -287,7 +289,7 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
         const postPromises = desiredApplications.map(async desiredApp => {
             const app = applicationDatabase[desiredApp];
 
-            const post = await addToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
+            const post = await addToLaunchpad(domain, sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
             if (!post.success)
                 appsNotAdded.push(app.title);
             else
@@ -309,7 +311,7 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
             else {
                 const app = applicationDatabase[desiredApp];
 
-                const post = await addToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
+                const post = await addToLaunchpad(domain, sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
                 if (!post.success)
                     appsNotAdded.push(app.title);
                 else
@@ -332,7 +334,7 @@ export const launchpadInstallation = async (sbAuthKey, accessorIDs, desiredAppli
                 appsNotAdded.push(`${desiredApp} (Not a option at this time)`);
             } else {
                 const app = applicationDatabase[desiredApp];
-                const post = await addToLaunchpad(sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
+                const post = await addToLaunchpad(domain, sbAuthKey, accessorIDs, app.url, app.image, app.title, app.description);
                 if (!post.success)
                     appsNotAdded.push(app.title);
                 else

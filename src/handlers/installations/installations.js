@@ -23,6 +23,7 @@ export const installations = async (req, res, next) => {
     const customWidgets = req.body.hasOwnProperty("customWidgets") ? req.body.customWidgets : undefined;
     const mobileQuickLinks = req.body.hasOwnProperty("mobileQuickLinks") ? req.body.mobileQuickLinks : undefined;
     const workdayMerge = req.body.hasOwnProperty("workdayMerge") ? req.body.workdayMerge : undefined;
+    const domain = req.body.hasOwnProperty("domain") ? req.body.domain : 'app.staffbase.com';
 
     //A accessor ID is needed for almost all the the scripts. Thus we start by getting the accessorID
     const spaces = await getSBSpaces(undefined, sbAuthKey);
@@ -41,13 +42,14 @@ export const installations = async (req, res, next) => {
 
     //if chat is set to true in request payload, install chat
     if (chat === true) {
-        const chatInstall = await chatInstallation(sbAuthKey, accessorIDs);
+        const chatInstall = await chatInstallation(domain, sbAuthKey, accessorIDs);
+        console.log(domain);
         scriptResponse['chat'] = chatInstall
     }
 
     //if launchpad is not set to undefined and assuming the correct data is provide in the payload, install the launchpad applications
     if (launchpad !== undefined) {
-        const launchpadInstall = await launchpadInstallation(sbAuthKey, accessorIDs, launchpad);
+        const launchpadInstall = await launchpadInstallation(domain, sbAuthKey, accessorIDs, launchpad);
         scriptResponse['launchpad'] = launchpadInstall
     }
 
@@ -62,7 +64,7 @@ export const installations = async (req, res, next) => {
         else if (!Array.isArray(journeys["desired"]))
             scriptResponse['journeys'] = 'Error: Please make sure you provide an Array as the value for "desired" in your Journey JSON';
         else {
-            const journeysInstall = await journeysInstallation(sbAuthKey, accessorIDs, journeys["desired"], journeys["user"]);
+            const journeysInstall = await journeysInstallation(domain, sbAuthKey, accessorIDs, journeys["desired"], journeys["user"]);
             scriptResponse['journeys'] = journeysInstall;
         }
 
@@ -70,13 +72,13 @@ export const installations = async (req, res, next) => {
 
     //if microsoft is set to true, install the microsoft integration
     if (microsoft === true) {
-        const microsoftInstall = await microsoftInstallation(sbAuthKey);
+        const microsoftInstall = await microsoftInstallation(domain, sbAuthKey);
         scriptResponse['microsoft'] = microsoftInstall;
     }
 
     //if campaigns is set to true, add campaigns to the env
     if (campaigns === true) {
-        const campaignInsalls = await campaignsInstallation(sbAuthKey);
+        const campaignInsalls = await campaignsInstallation(domain, sbAuthKey);
         scriptResponse['campaigns'] = campaignInsalls;
     }
 
@@ -113,7 +115,7 @@ export const installations = async (req, res, next) => {
             }
         }
         if (looksGood) {
-            const menuInstall = await mobileQuickLinkInstallation(sbAuthKey, accessorIDs, mobileQuickLinks);
+            const menuInstall = await mobileQuickLinkInstallation(domain, sbAuthKey, accessorIDs, mobileQuickLinks);
             scriptResponse['mobile quicklinks'] = menuInstall;
         }
     }
@@ -125,7 +127,7 @@ export const installations = async (req, res, next) => {
         } else if (typeof customWidgets[0] !== 'string' || typeof customWidgets[1] !== 'string') {
             scriptResponse['custom widgets'] = 'Error: Please make sure your array is only using string values';
         } else {
-            const customWidgetsInstall = await customWidgetsInstallation(customWidgets[0], customWidgets[1]);
+            const customWidgetsInstall = await customWidgetsInstallation(domain, customWidgets[0], customWidgets[1]);
             scriptResponse['custom widgets'] = customWidgetsInstall
         }
 

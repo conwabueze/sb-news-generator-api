@@ -1,46 +1,17 @@
-import axios from 'axios';
 import puppeteer from 'puppeteer';
-
-// const postCustomWidget = async (sbAuthKey, widgetUrl) => {
-//     const url = 'https://app.staffbase.com/api/branch/widgets';
-
-//     const headers = {
-//         'Authorization': `Basic ${sbAuthKey}`,
-//         'Content-Type': 'application/json;charset=utf-8'
-//     };
-
-//     const payload = {
-//         "url": "https://eirastaffbase.github.io/stock-ticker/dist/staffbase.stock-ticker.js",
-//         "elements": [
-//             "stock-ticker"
-//         ],
-//         "attributes": [
-//             "symbol",
-//             "weeks"
-//         ]
-//     }
-
-//     try {
-//         const response = await axios.post(url, payload, { headers });
-//         return { success: true, data: response.data }
-//     } catch (error) {
-//         return { success: false, data: error }
-//     }
-
-// }
 
 /**
  * Asynchronously installs a predefined list of custom widgets into a Staffbase environment
  * by automating browser actions using Puppeteer. It logs into the Staffbase Studio,
  * navigates to the custom widgets settings, and adds each widget URL.
- *
- * @async
+ * * @async
+ * @param {string} [domain='app.staffbase.com'] - The domain of the Staffbase environment.
  * @param {string} email - The email address used to log in to the Staffbase Studio.
  * @param {string} password - The password used to log in to the Staffbase Studio.
- * @returns {Promise<boolean>} - A promise that resolves to `true` if all widgets were
- * successfully added, and `false` if any error occurred during the process.
+ * @returns {Promise<string>} - A promise that resolves to a success message string if all widgets were
+ * successfully added, or an error message string if any error occurred.
  */
-export const customWidgetsInstallation = async (email, password) => {
+export const customWidgetsInstallation = async (domain = 'app.staffbase.com', email, password) => {
     // An object mapping a user-friendly name for each custom widget to its installation URL.
     const customWidgetList = {
         "stock-ticker": "https://eirastaffbase.github.io/stock-ticker/dist/staffbase.stock-ticker.js",
@@ -72,7 +43,8 @@ export const customWidgetsInstallation = async (email, password) => {
         const page = await browser.newPage(); // Create a new page within the browser.
 
         // --- Step 1: Sign in to Staffbase Studio ---
-        await page.goto('https://app.staffbase.com/studio', {
+        // Updated to use the dynamic domain variable
+        await page.goto(`https://${domain}/studio`, {
             waitUntil: 'networkidle0', // Wait until there are no more network connections for at least 500 ms (considered stable).
             timeout: 60000, // Set a timeout of 60 seconds for the page to load.
         });
@@ -89,7 +61,8 @@ export const customWidgetsInstallation = async (email, password) => {
         await page.click('button[type="submit"]'); // Click the submit button to log in.
 
         // --- Step 2: Navigate to Custom Widgets Settings ---
-        await page.goto('https://app.staffbase.com/admin/settings/widgets'); // Navigate directly to the custom widgets settings page.
+        // Updated to use the dynamic domain variable
+        await page.goto(`https://${domain}/admin/settings/widgets`); // Navigate directly to the custom widgets settings page.
 
         // --- Step 3: Add each custom widget from the list ---
         const widgetOptions = Object.keys(customWidgetList); // Get an array of the widget names (keys from customWidgetList).

@@ -6,20 +6,13 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  * @function getCampaigns
  * @description Retrieves a list of campaigns from the Staffbase API.
  *
+ * @param {string} [domain='app.staffbase.com'] - The domain of the Staffbase environment.
  * @param {string} sbAuthKey - The Staffbase API authentication key.
  *
- * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
- * - If the API call is successful, the object will have:
- * - `success`: true
- * - `data`: An object containing the campaign data returned by the Staffbase API.
- * - If the API call fails, the object will have:
- * - `success`: false
- * - `data`: The error object caught during the API call.
- *
- * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ * @returns {Promise<{ success: boolean, data: object|Error }>}
  */
-const getCampaigns = async (sbAuthKey) => {
-    const url = 'https://app.staffbase.com/api/campaigns';
+const getCampaigns = async (domain = 'app.staffbase.com', sbAuthKey) => {
+    const url = `https://${domain}/api/campaigns`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -31,7 +24,6 @@ const getCampaigns = async (sbAuthKey) => {
     } catch (error) {
         return { success: false, data: error }
     }
-
 }
 
 /**
@@ -39,25 +31,18 @@ const getCampaigns = async (sbAuthKey) => {
  * @function createCampaign
  * @description Creates a new campaign in Staffbase.
  *
+ * @param {string} [domain='app.staffbase.com'] - The domain of the Staffbase environment.
  * @param {string} sbAuthKey - The Staffbase API authentication key.
  * @param {string} title - The title of the campaign to be created.
  * @param {string} goal - The goal or objective of the campaign.
- * @param {string} color - The color to be associated with the campaign (e.g., a hex code).
- * @param {string} startAt - The start date and time of the campaign in ISO 8601 format (e.g., '2023-10-26T10:00:00.000Z').
- * @param {string} endAt - The end date and time of the campaign in ISO 8601 format (e.g., '2023-11-30T17:00:00.000Z').
+ * @param {string} color - The color to be associated with the campaign.
+ * @param {string} startAt - The start date and time of the campaign in ISO 8601 format.
+ * @param {string} endAt - The end date and time of the campaign in ISO 8601 format.
  *
- * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
- * - If the API call is successful, the object will have:
- * - `success`: true
- * - `data`: An object containing the response data from the Staffbase API after creating the campaign.
- * - If the API call fails, the object will have:
- * - `success`: false
- * - `data`: The error object caught during the API call.
- *
- * @throws {Error} Will throw an error if the `axios.post` call fails (though this is caught and returned within the promise).
+ * @returns {Promise<{ success: boolean, data: object|Error }>}
  */
-const createCampaign = async (sbAuthKey, title, goal, color, startAt, endAt) => {
-    const url = 'https://app.staffbase.com/api/campaigns';
+const createCampaign = async (domain = 'app.staffbase.com', sbAuthKey, title, goal, color, startAt, endAt) => {
+    const url = `https://${domain}/api/campaigns`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -78,7 +63,6 @@ const createCampaign = async (sbAuthKey, title, goal, color, startAt, endAt) => 
     } catch (error) {
         return { success: false, data: error }
     }
-
 }
 
 /**
@@ -86,22 +70,15 @@ const createCampaign = async (sbAuthKey, title, goal, color, startAt, endAt) => 
  * @function assignCampaignToPost
  * @description Assigns a specific campaign to an existing Staffbase post.
  *
+ * @param {string} [domain='app.staffbase.com'] - The domain of the Staffbase environment.
  * @param {string} sbAuthKey - The Staffbase API authentication key.
- * @param {string} postId - The unique identifier of the Staffbase post to which the campaign will be assigned.
- * @param {string} campaignId - The unique identifier of the Staffbase campaign to be assigned to the post.
+ * @param {string} postId - The unique identifier of the Staffbase post.
+ * @param {string} campaignId - The unique identifier of the Staffbase campaign.
  *
- * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
- * - If the API call is successful, the object will have:
- * - `success`: true
- * - `data`: An object containing the response data from the Staffbase API after assigning the campaign.
- * - If the API call fails, the object will have:
- * - `success`: false
- * - `data`: The error object caught during the API call.
- *
- * @throws {Error} Will throw an error if the `axios.put` call fails (though this is caught and returned within the promise).
+ * @returns {Promise<{ success: boolean, data: object|Error }>}
  */
-const assignCampaignToPost = async (sbAuthKey, postId, campaignId) => {
-    const url = `https://app.staffbase.com/api/posts/${postId}`;
+const assignCampaignToPost = async (domain = 'app.staffbase.com', sbAuthKey, postId, campaignId) => {
+    const url = `https://${domain}/api/posts/${postId}`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -125,20 +102,13 @@ const assignCampaignToPost = async (sbAuthKey, postId, campaignId) => {
  * @function getBranchChannels
  * @description Retrieves a list of branch channels from the Staffbase API.
  *
+ * @param {string} [domain='app.staffbase.com'] - The domain of the Staffbase environment.
  * @param {string} sbAuthKey - The Staffbase API authentication key.
  *
- * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
- * - If the API call is successful, the object will have:
- * - `success`: true
- * - `data`: An object containing the branch channel data returned by the Staffbase API.
- * - If the API call fails, the object will have:
- * - `success`: false
- * - `data`: The error object caught during the API call.
- *
- * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ * @returns {Promise<{ success: boolean, data: object|Error }>}
  */
-const getBranchChannels = async (sbAuthKey) => {
-    const url = 'https://app.staffbase.com/api/branch/channels?limit=100';
+const getBranchChannels = async (domain = 'app.staffbase.com', sbAuthKey) => {
+    const url = `https://${domain}/api/branch/channels?limit=100`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -151,29 +121,21 @@ const getBranchChannels = async (sbAuthKey) => {
     } catch (error) {
         return { success: false, data: error }
     }
-
 }
 
 /**
  * @async
  * @function getChannelPosts
- * @description Retrieves a list of 40 posts from a specific Staffbase channel.
+ * @description Retrieves a list of posts from a specific Staffbase channel.
  *
+ * @param {string} [domain='app.staffbase.com'] - The domain of the Staffbase environment.
  * @param {string} sbAuthKey - The Staffbase API authentication key.
- * @param {string} channelID - The unique identifier of the Staffbase channel from which to retrieve posts.
+ * @param {string} channelID - The unique identifier of the Staffbase channel.
  *
- * @returns {Promise<{ success: boolean, data: object|Error }>} - A promise that resolves to an object.
- * - If the API call is successful, the object will have:
- * - `success`: true
- * - `data`: An object containing the post data returned by the Staffbase API for the specified channel.
- * - If the API call fails, the object will have:
- * - `success`: false
- * - `data`: The error object caught during the API call.
- *
- * @throws {Error} Will throw an error if the `axios.get` call fails (though this is caught and returned within the promise).
+ * @returns {Promise<{ success: boolean, data: object|Error }>}
  */
-const getChannelPosts = async (sbAuthKey, channelID) => {
-    const url = `https://app.staffbase.com/api/channels/${channelID}/posts?limit=100`;
+const getChannelPosts = async (domain = 'app.staffbase.com', sbAuthKey, channelID) => {
+    const url = `https://${domain}/api/channels/${channelID}/posts?limit=100`;
 
     const headers = {
         'Authorization': `Basic ${sbAuthKey}`,
@@ -186,52 +148,16 @@ const getChannelPosts = async (sbAuthKey, channelID) => {
     } catch (error) {
         return { success: false, data: error }
     }
-
 }
 
 /**
  * @async
  * @function generateCampaignData
- * @description Asynchronously generates campaign data (titles, descriptions, and associated post titles) using the Gemini API.
- * It determines whether to create new campaigns or associate provided post titles with existing campaigns
- * based on the presence of a `campaignsDictionary`.
- * @param {object | undefined} campaignsDictionary - An optional dictionary (object) containing existing campaign data.
- * If `undefined`, the function will generate entirely new campaigns.
- * @param {string} postTitles - A string containing a list of post titles that need to be organized into campaigns.
- * Each title should ideally be on a new line for better processing within the prompt.
+ * @description Asynchronously generates campaign data using the Gemini API.
+ * @param {object | undefined} campaignsDictionary - An optional dictionary containing existing campaign data.
+ * @param {string} postTitles - A string containing a list of post titles.
  * @param {string} [campaignTitles=''] - An optional string containing a list of existing campaign titles.
- * This is only used when `campaignsDictionary` is defined, providing context
- * for potentially associating new posts with existing campaigns.
- * @returns {Promise<{ success: boolean, data: object | Error }>} - A promise that resolves to an object indicating the success status
- * and the generated campaign data or an error object if something went wrong.
- * The data structure varies based on whether new campaigns are created
- * or existing ones are used.
- * - If `campaignsDictionary` is `undefined`:
- * ```json
- * {
- * "[Campaign Title]": {
- * "Description": "[Campaign Description]",
- * "Posts to add": [Title ID Number, ...]
- * },
- * ...
- * }
- * ```
- * - If `campaignsDictionary` is defined:
- * ```json
- * {
- * "Existing Campaigns": {
- * "[Existing Campaign Title]": [Title ID Number, ...],
- * ...
- * },
- * "New Campaigns": {
- * "[New Campaign Title]": {
- * "Description": "[Campaign Description]",
- * "Posts to add": [Title ID Number, ...]
- * },
- * ...
- * }
- * }
- * ```
+ * @returns {Promise<{ success: boolean, data: object | Error }>}
  */
 const generateCampaignData = async (campaignsDictionary, postTitles, campaignTitles = '') => {
     //gemini api initialization
@@ -329,21 +255,13 @@ const generateCampaignData = async (campaignsDictionary, postTitles, campaignTit
     } catch (error) {
         return { success: false, data: error }
     }
-
 }
 
 /**
  * @function isValidJSON
  * @description Checks if a given string is a valid JSON string.
- *
- * This function attempts to parse the input string using `JSON.parse()`.
- * If the parsing is successful, it means the string is valid JSON, and the function returns `true`.
- * If `JSON.parse()` throws an error (e.g., `SyntaxError`) during parsing,
- * it indicates that the string is not valid JSON, and the function returns `false`.
- *
  * @param {string} str The string to be checked for JSON validity.
  * @returns {boolean} `true` if the string is valid JSON, `false` otherwise.
- *
  */
 const isValidJSON = str => {
     try {
@@ -359,11 +277,12 @@ const isValidJSON = str => {
  * @description designed to automatically create and populate Staffbase campaigns based on the titles of existing, 
  * unassigned news posts, leveraging the Gemini AI model for grouping and description generation.
  *
+ * @param {string} [domain='app.staffbase.com'] - The domain of the Staffbase environment.
  * @param {string} sbAuthKey - The Staffbase API authentication key.
  * @returns {responseBody}
  *
  */
-export const campaignsInstallation = async (sbAuthKey) => {
+export const campaignsInstallation = async (domain = 'app.staffbase.com', sbAuthKey) => {
     //response body to return to client
     const responseBody = {
         "success": {},
@@ -371,7 +290,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
     }
 
     /*** 1. check to see if there are campigns. If yes, store the names and ids***/
-    const campaigns = await getCampaigns(sbAuthKey);
+    const campaigns = await getCampaigns(domain, sbAuthKey);
     if (!campaigns.success) {
         console.log(campaigns.data);
         responseBody['errors']['Campaign Get Error'] = 'Error getting campaigns';
@@ -394,7 +313,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
     /*** 2. get news content that is not assigned to a campaign already***/
 
     //get all news(article,updates) channels
-    const branchChannels = await getBranchChannels(sbAuthKey);
+    const branchChannels = await getBranchChannels(domain, sbAuthKey);
     if (!branchChannels.success) {
         responseBody['errors']['Branch Channel Get Error'] = 'Error getting branch channels. Please try again, if issue persist please reach out to manager of this script';
     }
@@ -414,7 +333,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
         for (const channel of branchChannels.data.data) {
             if (channel.contentType = 'articles') {
                 //get posts from channel
-                const channelPosts = await getChannelPosts(sbAuthKey, channel.id);
+                const channelPosts = await getChannelPosts(domain, sbAuthKey, channel.id);
                 if (!channelPosts.success) {
                     responseBody['errors'][`Error getting posts from channel ID:`] = channelPosts.id
                     continue;
@@ -507,7 +426,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
                             let successCount = 0;
                             const campaignAddPromises = existingCampaignPostArr.map(async existingCampaignPost => {
                                 // Assign the campaign to the post using the stored post ID and campaign ID.
-                                const addToCampaign = await assignCampaignToPost(sbAuthKey, titlesDictionaryToID[existingCampaignPost], existingCampaignID);
+                                const addToCampaign = await assignCampaignToPost(domain, sbAuthKey, titlesDictionaryToID[existingCampaignPost], existingCampaignID);
                                 if (!addToCampaign.success) {
                                     responseBody['errors'][`Error adding to existing campaign ${existingCampaign}`] = 'Issue adding to campaign';
                                     return; //skip loop iteration
@@ -533,7 +452,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
                         const newCampaignObject = jsonResult["New Campaigns"][newCampaign];
                         if (typeof newCampaignObject === "object" && newCampaignObject["Description"] && newCampaignObject["Posts to add"] && Array.isArray(newCampaignObject["Posts to add"])) {
                             //create new campaign
-                            const createdCampaign = await createCampaign(sbAuthKey, newCampaign, newCampaignObject["Description"], campaignColor, startAt, endAt);
+                            const createdCampaign = await createCampaign(domain, sbAuthKey, newCampaign, newCampaignObject["Description"], campaignColor, startAt, endAt);
                             if (!createdCampaign.success) {
                                 responseBody['errors'][`Error creating ${newCampaign}`] = 'There was a error creating a new campaign';
                                 return;
@@ -543,7 +462,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
                             // Loop through the post IDs that Gemini suggested adding to this new campaign.
                             const newCampaignAddedPostPromises = newCampaignObject["Posts to add"].map(async postID => {
                                 // Assign the campaign to the post using the stored post ID and the new campaign ID.
-                                const addToCampaign = await assignCampaignToPost(sbAuthKey, titlesDictionaryToID[postID], createdCampaignId);
+                                const addToCampaign = await assignCampaignToPost(domain, sbAuthKey, titlesDictionaryToID[postID], createdCampaignId);
                                 if (!addToCampaign.success) {
                                     responseBody['errors'][`Error adding to new campaign ${newCampaign}`] = 'Issue adding to campaign';
                                     return; //skip loop iteration
@@ -570,7 +489,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
                         if (typeof jsonResult[campaign] === "object" && jsonResult[campaign]["Description"] && jsonResult[campaign]["Posts to add"] && Array.isArray(jsonResult[campaign]["Posts to add"])) {
                             const newCampaignObject = jsonResult[campaign];
                             // Create the new campaign.
-                            const createdCampaign = await createCampaign(sbAuthKey, campaign, newCampaignObject["Description"], campaignColor, startAt, endAt);
+                            const createdCampaign = await createCampaign(domain, sbAuthKey, campaign, newCampaignObject["Description"], campaignColor, startAt, endAt);
                             if (!createdCampaign.success) {
                                 responseBody['errors'][`Error creating ${campaign}`] = 'There was a error creating a new campaign';
                                 return; // Skip the current iteration if campaign creation fails.
@@ -581,7 +500,7 @@ export const campaignsInstallation = async (sbAuthKey) => {
                             // Loop through the post IDs that Gemini suggested adding to this new campaign.
                             const newCampaignAddedPostPromises = newCampaignObject["Posts to add"].map(async postID => {
                                 // Assign the campaign to the post using the stored post ID and the new campaign ID.
-                                const addToCampaign = await assignCampaignToPost(sbAuthKey, titlesDictionaryToID[postID], createdCampaignId);
+                                const addToCampaign = await assignCampaignToPost(domain, sbAuthKey, titlesDictionaryToID[postID], createdCampaignId);
                                 if (!addToCampaign.success) {
                                     responseBody['errors'][`Error adding to new campaign ${campaign}`] = 'Issue adding to campaign';
                                     return; // Skip the current iteration if there's an error.

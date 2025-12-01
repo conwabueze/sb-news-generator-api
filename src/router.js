@@ -25,6 +25,7 @@ router.post('/installations',
     body('mobileQuickLinks').optional().isObject().withMessage('Please make sure you are using a Object for mobileQuickLinks'),
     body('customWidgets').optional().isArray().withMessage('Please make sure you are using a array value for customWidgets'),
     body('workdayMerge').optional().isArray().withMessage('Please make sure you are using a array value for workdayMerge'),
+    body('domain').optional().isString().withMessage("Make sure 'domain' is a string value"),
     handleInputErrors,
     installations);
 router.post('/generate/email-templates',
