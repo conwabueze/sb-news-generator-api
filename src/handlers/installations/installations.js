@@ -139,7 +139,7 @@ export const installations = async (req, res, next) => {
         } else if (typeof workdayMerge[0] !== 'string' || typeof workdayMerge[1] !== 'string' || typeof workdayMerge[2] !== 'string') {
             scriptResponse['workdayMerge'] = 'Error: Please make sure your array is only using string values';
         } else {
-            const workdayMergeInstall = await workdayMergeInstallation(workdayMerge[0], workdayMerge[1], workdayMerge[2]);
+            const workdayMergeInstall = await workdayMergeInstallation(domain, workdayMerge[0], workdayMerge[1], workdayMerge[2]);
             scriptResponse['workdayMerge'] = workdayMergeInstall;
         }
     }

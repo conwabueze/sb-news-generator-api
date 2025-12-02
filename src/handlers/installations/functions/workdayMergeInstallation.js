@@ -1,22 +1,32 @@
 import puppeteer from 'puppeteer';
 
-export const workdayMergeInstallation = async (email, password, userStudioIdentifier) => {
+/**
+ * Asynchronously automates the installation of the Workday integration via the Staffbase Studio using Puppeteer.
+ * It handles the login process, navigation to HR integrations, and the multi-step configuration within the Merge Link iFrame.
+ *
+ * @async
+ * @function workdayMergeInstallation
+ * @param {string} [domain='app.staffbase.com'] - The domain of the Staffbase environment.
+ * @param {string} email - The email address used to log in to the Staffbase Studio.
+ * @param {string} password - The password used to log in to the Staffbase Studio.
+ * @param {string} userStudioIdentifier - The specific user identifier to select within the Staffbase Studio UI (e.g., 'Workday Integration').
+ * @returns {Promise<string>} - A promise that resolves to a success message string if the integration was successfully added, or an error message string if failed.
+ */
+export const workdayMergeInstallation = async (domain = 'app.staffbase.com', email, password, userStudioIdentifier) => {
     let browser = undefined;
     try {
         //browser = await puppeteer.launch({ headless: true, defaultViewport: null, args: ['--no-sandbox']  }); // Set headless to false to see the browser
         browser = await puppeteer.launch({
             headless: 'new',
             //headless: false,
-            args: ['--no-sandbox'],
-            // defaultViewport: {
-            //     width: 1920,
-            //     height: 1080
-            // }
+            args: ['--no-sandbox']
+            //defaultViewport: null
         });
         const page = await browser.newPage();
 
         //sign in to studio
-        await page.goto('https://app.staffbase.com/studio', {
+        // Updated to use the dynamic domain variable
+        await page.goto(`https://${domain}/studio`, {
             waitUntil: 'networkidle0', // or 'load'
             timeout: 60000, // 60 seconds
         });
@@ -39,7 +49,8 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
         await page.click('button[type="submit"]');
 
         //Select Workday HR Option
-        await page.goto('https://app.staffbase.com/studio/settings/extensions/hr-integrations');
+        // Updated to use the dynamic domain variable
+        await page.goto(`https://${domain}/studio/settings/extensions/hr-integrations`);
         await page.waitForSelector('button[data-testid="merge-dev-extensions-card__add-btn"]');
 
         // if(!addIntegrationBtn){
@@ -148,7 +159,7 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
         selector = 'input[placeholder="Password"]';
         await iframeContentFrame.waitForSelector(selector);
         await iframeContentFrame.click(selector);
-        await iframeContentFrame.type(selector, process.env.WORKDAY_PASSWORD.replace(/'/g, ''));
+        await iframeContentFrame.type(selector, process.env.WORKDAY_PASSWORD);
 
         //click next 
         selector = '#custom-button';
@@ -202,7 +213,7 @@ export const workdayMergeInstallation = async (email, password, userStudioIdenti
         await iframeContentFrame.waitForSelector(selector);
         await iframeContentFrame.click(selector);
 
-        await new Promise(resolve => setTimeout(resolve, 7000));
+        await new Promise(resolve => setTimeout(resolve, 10000));
 
         //close browser
         await browser.close();
