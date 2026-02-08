@@ -5,6 +5,7 @@ import { bulkScrapeLinkedinToStaffbaseArticle } from './handlers/linkedin/linked
 import { generateComments } from './handlers/comments.js';
 import { installations } from './handlers/installations/installations.js';
 import { templateGeneration } from './handlers/emailTemplates/emailTemplates.js';
+import { templateGenerationv2 } from './handlers/emailTemplates/emailTemplatesv2.js';
 
 const router = Router();
 
@@ -28,9 +29,20 @@ router.post('/installations',
     body('domain').optional().isString().withMessage("Make sure 'domain' is a string value"),
     handleInputErrors,
     installations);
+
 router.post('/generate/email-templates',
     body('domain').isString().withMessage("Please make sure you add a 'domain'. Make sure it is a string"),
     handleInputErrors,
     templateGeneration,
+);
+
+router.post('/generate/email-templates-v2',
+    body('source_domain').isString().withMessage("Please make sure you add a 'source_domain'. Make sure it is a string"),
+    body('destination_domain').isString().withMessage("Please make sure you add a 'destination_domain'. Make sure it is a string"),
+    body('templates').optional().isArray().withMessage("Make sure 'templates' is an array"),
+    body('templateGallery').optional().isString().withMessage("Make sure 'templateGallery' is a string"),
+    body('drafts').optional().isArray().withMessage("Make sure 'drafts' is an array"),
+    handleInputErrors,
+    templateGenerationv2,
 );
 export default router;

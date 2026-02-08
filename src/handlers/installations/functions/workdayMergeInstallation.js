@@ -18,9 +18,9 @@ export const workdayMergeInstallation = async (domain = 'app.staffbase.com', ema
         //browser = await puppeteer.launch({ headless: true, defaultViewport: null, args: ['--no-sandbox']  }); // Set headless to false to see the browser
         browser = await puppeteer.launch({
             headless: 'new',
-            //headless: false,
-            args: ['--no-sandbox']
-            //defaultViewport: null
+            headless: false,
+            args: ['--no-sandbox'],
+            defaultViewport: null
         });
         const page = await browser.newPage();
 

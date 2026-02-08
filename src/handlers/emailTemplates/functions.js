@@ -213,7 +213,7 @@ export const uploadEmailMediaToStaffbase = async (apiToken, domain, imageUrl, fi
                 'Content-Type': `multipart/form-data;`
             },
         });
-
+        console.log(uploadResponse)
         const previewImageData = uploadResponse.data.transformations.t_preview.resourceInfo;
         return {
             success: true,
@@ -231,6 +231,7 @@ export const uploadEmailMediaToStaffbase = async (apiToken, domain, imageUrl, fi
 
 export const retryFunction = async (func, maxRetries = 3, ...args) => {
     let retries = 0;
+    let error = ''
 
     while (retries < maxRetries) {
         const result = await func(...args);
@@ -244,5 +245,41 @@ export const retryFunction = async (func, maxRetries = 3, ...args) => {
     }
 
     console.error(`Function failed after ${maxRetries} attempts.`);
-    return { success: false, errorMessage: `Function failed after ${maxRetries} attempts.`, originalError: null }; // All retries failed
+    return { success: false, errorMessage: `Function failed after ${maxRetries} attempts.`, originalError: '' }; // All retries failed
 };
+
+export const getEmailMetadata = async (token, domain, templateId) => {
+    const url = `https://${domain}/api/email-service/emails/${templateId}`;
+
+    const headers = {
+        'Authorization': `Basic ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        console.log(error);
+        return { success: false, data: error }
+    }
+
+}
+
+export const getEmailContents = async (token, domain, templateId) => {
+    const url = `https://${domain}/api/email-service/emails/${templateId}/contents/pikasso`;
+
+    const headers = {
+        'Authorization': `Basic ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        console.log(error);
+        return { success: false, data: error }
+    }
+
+}

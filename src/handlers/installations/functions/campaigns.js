@@ -162,7 +162,7 @@ const getChannelPosts = async (domain = 'app.staffbase.com', sbAuthKey, channelI
 const generateCampaignData = async (campaignsDictionary, postTitles, campaignTitles = '') => {
     //gemini api initialization
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-thinking-exp-01-21" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     let result = undefined;
 
     //context for prompt providing understanding on what Staffbase Campaigns are
@@ -377,6 +377,7 @@ export const campaignsInstallation = async (domain = 'app.staffbase.com', sbAuth
             result = campaignData.data;
         } else {
             responseBody['errors'][`Gemini Request Error`] = 'There was a error in the Gemini Request. Please run this script again. If issue persists, please reach out to manager of the script.'
+            console.log(campaignData.data);
             return responseBody;
         }
 
