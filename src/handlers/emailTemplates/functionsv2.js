@@ -29,6 +29,7 @@ export const uploadEmailMediaToStaffbase = async (sourceToken, destToken, source
             },
         });
         const previewImageData = uploadResponse.data.transformations.t_preview.resourceInfo;
+        //console.log(uploadResponse.data)
         return {
             success: true,
             data: {
@@ -39,7 +40,7 @@ export const uploadEmailMediaToStaffbase = async (sourceToken, destToken, source
             },
         };
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         return { success: false, data: error };
     }
 };
@@ -92,3 +93,32 @@ export const retryFunction = async (func, maxRetries = 3, ...args) => {
     console.error(`Function failed after ${maxRetries} attempts.`);
     return { success: false, errorMessage: `Function failed after ${maxRetries} attempts.`, data: error }; // All retries failed
 };
+
+export const searchEmails = async (token, domain, type) => {
+    const url = `https://${domain}/api/email-service/emails/search`;
+
+
+    const headers = {
+        'Authorization': `Basic ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    const payload = {
+        "orderAsc": false,
+        "authorIds": [],
+        "folderIds": [],
+        "spaceIds": [],
+        "limit": 100,
+        "type": type
+    };
+
+    try {
+        const response = await axios.post(url, payload, { headers });
+        console.log(response)
+        return { success: true, data: response.data }
+    } catch (error) {
+        console.log(error);
+        return { success: false, data: error }
+    }
+
+}

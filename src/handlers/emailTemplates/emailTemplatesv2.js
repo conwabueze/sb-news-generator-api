@@ -1,6 +1,6 @@
 /* Version 2 of email template generator. This version can migrate specific or all emails from one env to the next */
 import { addTemplateCoverImage, createTemplateGallery, getEmailContents, getEmailMetadata, getExistingTemplateNames, getExistingTemplates, getSBSpaces, getTemplate, getTemplateGallery, putContentToTemplate, replaceSrcUrls } from "./functions.js"
-import { uploadEmailMediaToStaffbase, createTemplate, retryFunction } from "./functionsv2.js";
+import { uploadEmailMediaToStaffbase, createTemplate, retryFunction, searchEmails } from "./functionsv2.js";
 import { promises as fsPromises } from 'fs';
 import path from 'path';
 
@@ -96,7 +96,87 @@ export const templateGenerationv2 = async (req, res, next) => {
 
     //if user just wants all drafts
     if (drafts.length === 1 && drafts[0] === 'all') {
-        return ''
+        const currentDrafts = await searchEmails(sourceToken, source_domain, 'draft');
+
+        if (!currentDrafts.success) {
+            res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_EMAILS', message: currentDrafts.data.message });
+            return;
+        }
+        for (const draft of currentDrafts.data.data) {
+            const draftId = draft.id;
+            //get email metadata. need name of email.
+            const emailMetadata = await getEmailMetadata(sourceToken, source_domain, draftId);
+            if (!emailMetadata.success) {
+                res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_EMAIL_METADATA', message: emailMetadata.data.message });
+                return;
+            };
+            const emailName = emailMetadata.data.title;
+            //get contents of email draft
+            let emailContents = await getEmailContents(sourceToken, source_domain, draftId);
+            if (!emailContents.success) {
+                res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_EMAIL_CONTENT', message: emailContents.data.message });
+                return;
+            };
+            emailContents = emailContents.data.contents;
+
+            /*
+            Once we have the content of the email, we have to loop through the content to identify each image src url,
+            and copy the image from the source to deninations. Once the image is transferred we replace it with the new image url
+            in the body before posting. 
+            */
+
+            //emailContents is a object with nested lanaguage objects that then has another nest object containing the email in that lanaguage
+            //though a blocks array. Each block is a object representing each block of the email and its elements.
+            //We are only grabbing the first lanaguage.
+            emailContents = Object.values(emailContents)[0];
+
+            //loop through each of the content blocks and verifiy which image need to be replaced and do so.
+            for (const contentBlock of emailContents.blocks) {
+                //each block has columns and each col has items/elements within it
+                const contentBlockColumns = contentBlock.content.columns;
+
+                //once you get ahold of the content block cols, we mush go through each column and to access the items of that column
+                for (const contentBlockColumn of contentBlockColumns) {
+                    const columnItems = contentBlockColumn.columnItems;
+
+                    if (columnItems.length == 0)
+                        continue; //if there are no items, just move on
+
+                    //once we got ahold of the columns items, we need to look through each one for images and videos
+                    for (const columnItem of columnItems) {
+                        if (columnItem.type !== 'IMAGE' && columnItem.type !== 'VIDEO') {
+                            continue;
+                        }
+                        else if (columnItem.type === 'IMAGE') {
+                            //get image from email and upload it to new env
+                            const imageUrl = columnItem.content.src;
+                            const mediumId = imageUrl.split('/').pop().split('.')[0];
+                            const uploadedMedia = await retryFunction(uploadEmailMediaToStaffbase, 3, sourceToken, destToken, source_domain, destination_domain, mediumId)
+                            if (!uploadedMedia.success) {
+                                console.log(columnItem);
+                                res.status(400).json({ error: 'ISSUE_UPLOADING_MEDIA_ERROR', data: uploadedMedia.data });
+                                return;
+                            }
+                            //uploadEmailMediaToStaffbase(sourceToken, destToken, source_domain, destination_domain, columnItem.content.mediumId)
+
+                            //Swap col image(s) with update data
+                            columnItem.content.mediumId = uploadedMedia.data.mediumId;
+                            columnItem.content.src = uploadedMedia.data.url;
+                        }
+                        else if (columnItem.type === 'VIDEO') {
+                            console.log(columnItem.content.rawSource)
+                        }
+                    }
+                }
+            }
+
+            //once the email content is update post that new email in the template library
+            const templateCreation = await retryFunction(createTemplate, 3, destToken, destination_domain, emailName, templeGalleryID, emailContents);
+            if (!templateCreation.success) {
+                res.status(400).json({ error: 'ISSUE_CREATING_TEMPLATE', data: templateCreation.data });
+                return;
+            }
+        };
     }
     //if user wants specific drafts
     else {
@@ -146,10 +226,12 @@ export const templateGenerationv2 = async (req, res, next) => {
                             continue;
                         }
                         else if (columnItem.type === 'IMAGE') {
+                            const imageUrl = columnItem.content.src;
+                            const mediumId = imageUrl.split('/').pop().split('.')[0];
                             //get image from email and upload it to new env
-                            const uploadedMedia = await retryFunction(uploadEmailMediaToStaffbase, 3, sourceToken, destToken, source_domain, destination_domain, columnItem.content.mediumId)
+                            const uploadedMedia = await retryFunction(uploadEmailMediaToStaffbase, 3, sourceToken, destToken, source_domain, destination_domain, mediumId)
                             if (!uploadedMedia.success) {
-                                res.status(400).json({ error: 'ISSUE_UPLOADING_MEDIA_ERROR', data: uploadedMedia.data });
+                                res.status(400).json({ error: 'ISSUE_UPLOADING_MEDIA_ERROR', data: uploadedMedia.data.message });
                                 return;
                             }
                             //uploadEmailMediaToStaffbase(sourceToken, destToken, source_domain, destination_domain, columnItem.content.mediumId)
@@ -159,7 +241,7 @@ export const templateGenerationv2 = async (req, res, next) => {
                             columnItem.content.src = uploadedMedia.data.url;
                         }
                         else if (columnItem.type === 'VIDEO') {
-                            console.log(columnItem.content.rawSource)
+                            //console.log(columnItem.content.rawSource)
                         }
                     }
                 }
@@ -172,6 +254,12 @@ export const templateGenerationv2 = async (req, res, next) => {
                 return;
             }
         };
+    }
+
+    if (templates.length === 1 && templates[0] === 'all') {
+
+    } else {
+
     }
     res.status(200).json({ message: 'migration complete' });
 }
