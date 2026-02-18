@@ -62,7 +62,7 @@ export const getTemplate = async (token, domain, templateId) => {
 }
 
 export const getTemplateGallery = async (token, domain) => {
-    const url = `https://${domain}/api/email-service/galleries?limit=20`;
+    const url = `https://${domain}/api/email-service/galleries?limit=100`;
 
     const headers = {
         'Authorization': `Basic ${token}`,

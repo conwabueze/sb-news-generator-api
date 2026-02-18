@@ -122,3 +122,21 @@ export const searchEmails = async (token, domain, type) => {
     }
 
 }
+
+export const getEmailContents = async (token, domain, templateId) => {
+    const url = `https://${domain}/api/email-service/templates/${templateId}/contents/pikasso`;
+
+    const headers = {
+        'Authorization': `Basic ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        return { success: true, data: response.data }
+    } catch (error) {
+        console.log(error);
+        return { success: false, data: error }
+    }
+
+}

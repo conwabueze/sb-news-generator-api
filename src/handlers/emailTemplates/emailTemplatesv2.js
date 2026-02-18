@@ -1,6 +1,6 @@
 /* Version 2 of email template generator. This version can migrate specific or all emails from one env to the next */
-import { addTemplateCoverImage, createTemplateGallery, getEmailContents, getEmailMetadata, getExistingTemplateNames, getExistingTemplates, getSBSpaces, getTemplate, getTemplateGallery, putContentToTemplate, replaceSrcUrls } from "./functions.js"
-import { uploadEmailMediaToStaffbase, createTemplate, retryFunction, searchEmails } from "./functionsv2.js";
+import { addTemplateCoverImage, createTemplateGallery, getEmailMetadata, getExistingTemplateNames, getExistingTemplates, getSBSpaces, getTemplate, getTemplateGallery, putContentToTemplate, replaceSrcUrls } from "./functions.js"
+import { uploadEmailMediaToStaffbase, createTemplate, retryFunction, searchEmails, getEmailContents } from "./functionsv2.js";
 import { promises as fsPromises } from 'fs';
 import path from 'path';
 
@@ -9,7 +9,7 @@ export const templateGenerationv2 = async (req, res, next) => {
     const destToken = req.headers['x-destination-api-key'].split(' ')[1];
     const source_domain = req.body.source_domain;
     const destination_domain = req.body.destination_domain;
-    let templeGalleryID = req.body.templateGallery;
+    let templateGalleryID = req.body.templateGallery;
     const templates = req.body.templates;
     const drafts = req.body.drafts;
 
@@ -51,7 +51,7 @@ export const templateGenerationv2 = async (req, res, next) => {
     /**
      * Step #1. If there is not a specified gallery use the default on or create one
      * **/
-    if (templeGalleryID === undefined) {
+    if (templateGalleryID === undefined) {
         //Pull List of existing template gallerys
         let currentEnvTemplateGalleries = await getTemplateGallery(destToken, destination_domain);
         if (!currentEnvTemplateGalleries.success) {
@@ -63,18 +63,18 @@ export const templateGenerationv2 = async (req, res, next) => {
         //Check to see if default template gallery already exists and save id
         for (const gallery of currentEnvTemplateGalleries) {
             if (gallery.name === 'Default Template Gallery') {
-                templeGalleryID = gallery.id;
+                templateGalleryID = gallery.id;
             }
         }
         //If it doesn't exist, create gallery
-        if (templeGalleryID === undefined) {
+        if (templateGalleryID === undefined) {
             //accessorID is the same as adminIds
             let newGallery = await createTemplateGallery(destToken, destination_domain, 'Default Template Gallery', 'Pre-defined Templates for your needs', accessorIDs, accessorIDs);
             if (!newGallery.success) {
                 res.status(400).json({ error: 'ISSUE_CREATING_TEMP GALLERY', message: `There was a issue creating a template gallery. Please try script again. If it keeps failing, please reach out to the SE Team.` });
                 return;
             }
-            templeGalleryID = newGallery.data.id;
+            templateGalleryID = newGallery.data.id;
         }
     }
     /***** 
@@ -95,7 +95,7 @@ export const templateGenerationv2 = async (req, res, next) => {
      * **/
 
     //if user just wants all drafts
-    if (drafts.length === 1 && drafts[0] === 'all') {
+    if (drafts !== undefined && drafts.length === 1 && drafts[0] === 'all') {
         const currentDrafts = await searchEmails(sourceToken, source_domain, 'draft');
 
         if (!currentDrafts.success) {
@@ -171,7 +171,7 @@ export const templateGenerationv2 = async (req, res, next) => {
             }
 
             //once the email content is update post that new email in the template library
-            const templateCreation = await retryFunction(createTemplate, 3, destToken, destination_domain, emailName, templeGalleryID, emailContents);
+            const templateCreation = await retryFunction(createTemplate, 3, destToken, destination_domain, emailName, templateGalleryID, emailContents);
             if (!templateCreation.success) {
                 res.status(400).json({ error: 'ISSUE_CREATING_TEMPLATE', data: templateCreation.data });
                 return;
@@ -179,7 +179,7 @@ export const templateGenerationv2 = async (req, res, next) => {
         };
     }
     //if user wants specific drafts
-    else {
+    else if (drafts !== undefined && drafts.length > 0) {
         //loop through email draft and copy it over to the destination
         for (const draftId of drafts) {
             //get email metadata. need name of email.
@@ -248,7 +248,7 @@ export const templateGenerationv2 = async (req, res, next) => {
             }
 
             //once the email content is update post that new email in the template library
-            const templateCreation = await retryFunction(createTemplate, 3, destToken, destination_domain, emailName, templeGalleryID, emailContents);
+            const templateCreation = await retryFunction(createTemplate, 3, destToken, destination_domain, emailName, templateGalleryID, emailContents);
             if (!templateCreation.success) {
                 res.status(400).json({ error: 'ISSUE_CREATING_TEMPLATE', data: templateCreation.data });
                 return;
@@ -256,10 +256,205 @@ export const templateGenerationv2 = async (req, res, next) => {
         };
     }
 
-    if (templates.length === 1 && templates[0] === 'all') {
+    if (templates !== undefined && templates.length === 1 && templates[0] === 'all') {
+        //we will recreate the structure of all gallaries when some sets all
 
-    } else {
+        /* 
+        ***
+        1.Get all galleries from source env and copy it to the dest env and add templates
+        ****
+        */
 
+        //pulls all galleries from dest env and save names. we will use this to double check if a gallery already exist between the source and destination. 
+        const desinationTemplateGalleries = await getTemplateGallery(destToken, destination_domain);
+
+        if (!desinationTemplateGalleries.success) {
+            res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_TEMP GALLERY', message: sourceTemplateGalleries.data.message });
+            return;
+        }
+
+        const desinationTemplateGalleriesNames = [];
+        const desinationTemplateGalleriesIds = [];
+
+        for (const templateGallery of desinationTemplateGalleries.data.data) {
+            desinationTemplateGalleriesNames.push(templateGallery.name);
+            desinationTemplateGalleriesIds.push(templateGallery.id);
+        }
+
+        //noww get source env galleries, cross check if they exist in dest env and apply template into each folder
+        const sourceTemplateGalleries = await getTemplateGallery(sourceToken, source_domain);
+
+        if (!sourceTemplateGalleries.success) {
+            res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_TEMP GALLERY', message: sourceTemplateGalleries.data.message });
+            return;
+        }
+
+        for (const templateGallery of sourceTemplateGalleries.data.data) {
+            let currentTempGallery = '';
+            //if template gal does not already exist in dest, create one.
+            if (!desinationTemplateGalleriesNames.includes(templateGallery.name)) {
+                const newTemplateGallery = await createTemplateGallery(destToken, destination_domain, templateGallery.name, '', templateGallery.accessorIds, templateGallery.adminIds);
+                if (!newTemplateGallery.success) {
+                    res.status(400).json({ error: 'ISSUE_CREATING_TEMP_GALLERY', message: newTemplateGallery.data.message });
+                    return;
+                }
+                currentTempGallery = newTemplateGallery.data.id;
+
+            }
+            //if destination already has a template go the same source. just grab the 
+            else {
+                const idIndex = desinationTemplateGalleriesNames.indexOf(templateGallery.name);
+                currentTempGallery = desinationTemplateGalleriesIds[idIndex];
+            }
+
+            //now thhat we have the id of the gallieries for the destination, go into the source galleries and copy over each template to the destinationa
+            const existingSourceTemplates = await getExistingTemplates(sourceToken, source_domain, templateGallery.id);
+            if (!existingSourceTemplates.success) {
+                res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_TEMPLATES', message: existingSourceTemplates.data.message });
+                return;
+            }
+
+            for (const sourceTemplateMetadata of existingSourceTemplates.data.data) {
+                const sourceTemplate = await getEmailContents(sourceToken, source_domain, sourceTemplateMetadata.id);
+                if (!sourceTemplate.success) {
+                    res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_TEMPLATE', message: sourceTemplate.data.message });
+                    return;
+                }
+                const emailContents = sourceTemplate.data.content;
+
+                /*
+                Once we have the content of the email, we have to loop through the content to identify each image src url,
+                and copy the image from the source to deninations. Once the image is transferred we replace it with the new image url
+                in the body before posting. 
+                */
+
+                //emailContents is a object with nested lanaguage objects that then has another nest object containing the email in that lanaguage
+                //though a blocks array. Each block is a object representing each block of the email and its elements.
+                //We are only grabbing the first lanaguage.
+
+                //loop through each of the content blocks and verifiy which image need to be replaced and do so.
+                for (const contentBlock of emailContents.blocks) {
+                    //each block has columns and each col has items/elements within it
+                    const contentBlockColumns = contentBlock.content.columns;
+
+                    //once you get ahold of the content block cols, we mush go through each column and to access the items of that column
+                    for (const contentBlockColumn of contentBlockColumns) {
+                        const columnItems = contentBlockColumn.columnItems;
+
+                        if (columnItems.length == 0)
+                            continue; //if there are no items, just move on
+
+                        //once we got ahold of the columns items, we need to look through each one for images and videos
+                        for (const columnItem of columnItems) {
+                            if (columnItem.type !== 'IMAGE' && columnItem.type !== 'VIDEO') {
+                                continue;
+                            }
+                            else if (columnItem.type === 'IMAGE') {
+                                const imageUrl = columnItem.content.src;
+                                const mediumId = imageUrl.split('/').pop().split('.')[0];
+                                //get image from email and upload it to new env
+                                const uploadedMedia = await retryFunction(uploadEmailMediaToStaffbase, 3, sourceToken, destToken, source_domain, destination_domain, mediumId)
+                                if (!uploadedMedia.success) {
+                                    res.status(400).json({ error: 'ISSUE_UPLOADING_MEDIA_ERROR', data: uploadedMedia.data.message });
+                                    return;
+                                }
+                                //uploadEmailMediaToStaffbase(sourceToken, destToken, source_domain, destination_domain, columnItem.content.mediumId)
+
+                                //Swap col image(s) with update data
+                                columnItem.content.mediumId = uploadedMedia.data.mediumId;
+                                columnItem.content.src = uploadedMedia.data.url;
+                            }
+                            else if (columnItem.type === 'VIDEO') {
+                                //console.log(columnItem.content.rawSource)
+                            }
+                        }
+                    }
+                }
+
+                //once the email content is update post that new email in the template library
+                const templateCreation = await retryFunction(createTemplate, 3, destToken, destination_domain, sourceTemplateMetadata.name, currentTempGallery, emailContents);
+                if (!templateCreation.success) {
+                    res.status(400).json({ error: 'ISSUE_CREATING_TEMPLATE', data: templateCreation.data });
+                    return;
+                }
+            }
+
+        }
+
+    } else if (templates !== undefined && templates.length > 0) {
+        //loop through email draft and copy it over to the destination
+        for (const templateId of templates) {
+            //get email metadata. need name of email.
+            const emailMetadata = await getTemplate(sourceToken, source_domain, templateId);
+            if (!emailMetadata.success) {
+                res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_EMAIL_METADATA', message: emailMetadata.data.message });
+                return;
+            };
+            const emailName = emailMetadata.data.name;
+            //get contents of email draft
+            const sourceTemplate = await getEmailContents(sourceToken, source_domain, templateId);
+            if (!sourceTemplate.success) {
+                res.status(400).json({ error: 'ISSUE_GETTING_SOURCE_TEMPLATE', message: sourceTemplate.data.message });
+                return;
+            }
+            const emailContents = sourceTemplate.data.content;
+
+            /*
+            Once we have the content of the email, we have to loop through the content to identify each image src url,
+            and copy the image from the source to deninations. Once the image is transferred we replace it with the new image url
+            in the body before posting. 
+            */
+
+            //emailContents is a object with nested lanaguage objects that then has another nest object containing the email in that lanaguage
+            //though a blocks array. Each block is a object representing each block of the email and its elements.
+            //We are only grabbing the first lanaguage.
+
+            //loop through each of the content blocks and verifiy which image need to be replaced and do so.
+            for (const contentBlock of emailContents.blocks) {
+                //each block has columns and each col has items/elements within it
+                const contentBlockColumns = contentBlock.content.columns;
+
+                //once you get ahold of the content block cols, we mush go through each column and to access the items of that column
+                for (const contentBlockColumn of contentBlockColumns) {
+                    const columnItems = contentBlockColumn.columnItems;
+
+                    if (columnItems.length == 0)
+                        continue; //if there are no items, just move on
+
+                    //once we got ahold of the columns items, we need to look through each one for images and videos
+                    for (const columnItem of columnItems) {
+                        if (columnItem.type !== 'IMAGE' && columnItem.type !== 'VIDEO') {
+                            continue;
+                        }
+                        else if (columnItem.type === 'IMAGE') {
+                            const imageUrl = columnItem.content.src;
+                            const mediumId = imageUrl.split('/').pop().split('.')[0];
+                            //get image from email and upload it to new env
+                            const uploadedMedia = await retryFunction(uploadEmailMediaToStaffbase, 3, sourceToken, destToken, source_domain, destination_domain, mediumId)
+                            if (!uploadedMedia.success) {
+                                res.status(400).json({ error: 'ISSUE_UPLOADING_MEDIA_ERROR', data: uploadedMedia.data.message });
+                                return;
+                            }
+                            //uploadEmailMediaToStaffbase(sourceToken, destToken, source_domain, destination_domain, columnItem.content.mediumId)
+
+                            //Swap col image(s) with update data
+                            columnItem.content.mediumId = uploadedMedia.data.mediumId;
+                            columnItem.content.src = uploadedMedia.data.url;
+                        }
+                        else if (columnItem.type === 'VIDEO') {
+                            //console.log(columnItem.content.rawSource)
+                        }
+                    }
+                }
+            }
+
+            //once the email content is update post that new email in the template library
+            const templateCreation = await retryFunction(createTemplate, 3, destToken, destination_domain, emailName, templateGalleryID, emailContents);
+            if (!templateCreation.success) {
+                res.status(400).json({ error: 'ISSUE_CREATING_TEMPLATE', data: templateCreation.data });
+                return;
+            }
+        };
     }
     res.status(200).json({ message: 'migration complete' });
 }
